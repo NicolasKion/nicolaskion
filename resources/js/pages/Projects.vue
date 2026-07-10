@@ -207,8 +207,8 @@ function timeAgo(date: string | null): string {
                     <p
                         class="max-w-xl text-lg text-neutral-600 dark:text-neutral-400"
                     >
-                        Most of them started as things I needed myself. The
-                        ones that can be open source are.
+                        Most of them started as things I needed myself. The ones
+                        that can be open source are.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <a
