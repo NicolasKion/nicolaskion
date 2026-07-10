@@ -27,7 +27,7 @@ return [
     |
     */
 
-    'description' => 'I build tools for the EVE Online community, from marketplaces and mapping tools to desktop apps. Projects include MutaMarket, wormhole.systems, Telescope, Killfeed, and more.',
+    'description' => 'I make tools for EVE Online: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more.',
 
     /*
     |--------------------------------------------------------------------------

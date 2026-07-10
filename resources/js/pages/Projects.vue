@@ -202,13 +202,13 @@ function timeAgo(date: string | null): string {
                     <h1
                         class="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
                     >
-                        I build tools for New Eden.
+                        I make tools for EVE Online.
                     </h1>
                     <p
                         class="max-w-xl text-lg text-neutral-600 dark:text-neutral-400"
                     >
-                        Marketplaces, mapping and intel tools, and desktop apps
-                        for EVE Online pilots.
+                        Most of them started as things I needed myself. The
+                        ones that can be open source are.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <a
