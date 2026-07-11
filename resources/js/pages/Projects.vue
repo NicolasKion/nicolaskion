@@ -126,6 +126,33 @@ const totalStars = computed(() =>
     ),
 );
 
+const nonAppLanguages = new Set(['Dockerfile', 'Shell', 'HTML', 'CSS']);
+
+const topLanguages = computed(() => {
+    const counts = new Map<string, number>();
+
+    for (const repository of props.repositories) {
+        if (repository.language && !nonAppLanguages.has(repository.language)) {
+            counts.set(
+                repository.language,
+                (counts.get(repository.language) ?? 0) + 1,
+            );
+        }
+    }
+
+    return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([language]) => language);
+});
+
+const latestRepository = computed(
+    () =>
+        [...props.repositories].sort((a, b) =>
+            (b.pushedAt ?? '').localeCompare(a.pushedAt ?? ''),
+        )[0] ?? null,
+);
+
 function toggleOwner(login: string): void {
     activeOwner.value = activeOwner.value === login ? null : login;
 }
@@ -179,55 +206,156 @@ function timeAgo(date: string | null): string {
                     class="pointer-events-none absolute -inset-x-8 -top-16 -bottom-8 bg-[radial-gradient(circle,rgba(26,26,25,0.22)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_70%_90%_at_30%_20%,black,transparent)] bg-[length:26px_26px] dark:bg-[radial-gradient(circle,rgba(231,229,228,0.16)_1px,transparent_1px)]"
                 />
                 <div
-                    class="relative flex flex-col gap-8 opacity-100 transition-opacity duration-700 starting:opacity-0"
+                    class="relative flex flex-col gap-12 opacity-100 transition-opacity duration-700 lg:flex-row lg:items-center lg:justify-between starting:opacity-0"
                 >
-                    <div
-                        class="flex items-center gap-3 font-mono text-xs tracking-widest uppercase"
-                    >
-                        <img
-                            v-if="profile"
-                            :src="profile.avatarUrl"
-                            :alt="displayName"
-                            class="h-9 w-9 rounded-full border border-neutral-300 dark:border-neutral-700"
-                        />
-                        <span class="text-accent">//</span>
-                        <a
-                            :href="githubUrl"
-                            target="_blank"
-                            class="text-neutral-500 transition-colors hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-200"
+                    <div class="flex max-w-xl flex-col gap-8">
+                        <div
+                            class="flex items-center gap-3 font-mono text-xs tracking-widest uppercase"
                         >
-                            {{ displayName }}
-                        </a>
+                            <span class="text-accent">//</span>
+                            <span class="text-neutral-500 dark:text-neutral-400"
+                                >EVE Online third party developer</span
+                            >
+                        </div>
+                        <h1
+                            class="text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
+                        >
+                            Hi, I'm Nicolas.
+                        </h1>
+                        <p
+                            class="text-lg text-neutral-600 dark:text-neutral-400"
+                        >
+                            I play EVE Online and build tools for it. Market
+                            helpers, wormhole mapping, killmail feeds, settings
+                            sync, that kind of thing. Most of it is open source,
+                            and all of it lives on this page.
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <a
+                                :href="githubUrl"
+                                target="_blank"
+                                class="rounded-md bg-ink px-5 py-2 text-sm font-medium text-paper transition-colors hover:bg-black dark:bg-neutral-200 dark:text-void dark:hover:bg-white"
+                            >
+                                GitHub
+                            </a>
+                            <a
+                                href="https://www.patreon.com/NicolasKion"
+                                target="_blank"
+                                class="rounded-md border border-neutral-300 px-5 py-2 text-sm font-medium transition-colors hover:border-accent hover:text-accent dark:border-neutral-700 dark:hover:border-accent"
+                            >
+                                Patreon
+                            </a>
+                        </div>
                     </div>
-                    <h1
-                        class="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
+
+                    <aside
+                        class="w-full shrink-0 rounded-lg border border-neutral-200 bg-white font-mono text-xs lg:w-80 dark:border-neutral-800 dark:bg-panel"
                     >
-                        Hi, I'm Nicolas.
-                    </h1>
-                    <p
-                        class="max-w-xl text-lg text-neutral-600 dark:text-neutral-400"
-                    >
-                        I play EVE Online and build tools for it. Market
-                        helpers, wormhole mapping, killmail feeds, settings
-                        sync, that kind of thing. Most of it is open source, and
-                        all of it lives on this page.
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a
-                            :href="githubUrl"
-                            target="_blank"
-                            class="rounded-md bg-ink px-5 py-2 text-sm font-medium text-paper transition-colors hover:bg-black dark:bg-neutral-200 dark:text-void dark:hover:bg-white"
+                        <div
+                            class="flex items-center gap-3 border-b border-neutral-200 px-5 py-3 tracking-widest uppercase dark:border-neutral-800"
                         >
-                            GitHub
-                        </a>
-                        <a
-                            href="https://www.patreon.com/NicolasKion"
-                            target="_blank"
-                            class="rounded-md border border-neutral-300 px-5 py-2 text-sm font-medium transition-colors hover:border-accent hover:text-accent dark:border-neutral-700 dark:hover:border-accent"
-                        >
-                            Patreon
-                        </a>
-                    </div>
+                            <span class="text-accent">//</span>
+                            <span class="text-neutral-500 dark:text-neutral-400"
+                                >Pilot dossier</span
+                            >
+                            <img
+                                v-if="profile"
+                                :src="profile.avatarUrl"
+                                :alt="displayName"
+                                class="ml-auto h-8 w-8 rounded-full border border-neutral-300 dark:border-neutral-700"
+                            />
+                        </div>
+                        <dl class="flex flex-col gap-3 px-5 py-4">
+                            <div class="flex justify-between gap-4">
+                                <dt
+                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Pilot
+                                </dt>
+                                <dd>
+                                    <a
+                                        :href="githubUrl"
+                                        target="_blank"
+                                        class="transition-colors hover:text-accent"
+                                    >
+                                        {{ displayName }}
+                                    </a>
+                                </dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt
+                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Focus
+                                </dt>
+                                <dd>EVE Online tooling</dd>
+                            </div>
+                            <div
+                                v-if="topLanguages.length > 0"
+                                class="flex justify-between gap-4"
+                            >
+                                <dt
+                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Stack
+                                </dt>
+                                <dd>{{ topLanguages.join(' · ') }}</dd>
+                            </div>
+                            <div
+                                v-if="repositories.length > 0"
+                                class="flex justify-between gap-4"
+                            >
+                                <dt
+                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Open source
+                                </dt>
+                                <dd>
+                                    {{ repositories.length }} repos ·
+                                    {{ totalStars }} stars
+                                </dd>
+                            </div>
+                            <div
+                                v-if="latestRepository"
+                                class="flex justify-between gap-4"
+                            >
+                                <dt
+                                    class="shrink-0 whitespace-nowrap text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Last push
+                                </dt>
+                                <dd class="flex min-w-0 gap-1.5">
+                                    <a
+                                        :href="latestRepository.htmlUrl"
+                                        target="_blank"
+                                        class="truncate transition-colors hover:text-accent"
+                                    >
+                                        {{ latestRepository.name }}
+                                    </a>
+                                    <span class="shrink-0 whitespace-nowrap">
+                                        ·
+                                        {{ timeAgo(latestRepository.pushedAt) }}
+                                    </span>
+                                </dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt
+                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                                >
+                                    Support
+                                </dt>
+                                <dd>
+                                    <a
+                                        href="https://www.patreon.com/NicolasKion"
+                                        target="_blank"
+                                        class="transition-colors hover:text-accent"
+                                    >
+                                        Patreon
+                                    </a>
+                                </dd>
+                            </div>
+                        </dl>
+                    </aside>
                 </div>
             </header>
 
