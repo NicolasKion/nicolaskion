@@ -288,15 +288,7 @@ function timeAgo(date: string | null): string {
                                 >
                                     Pilot
                                 </dt>
-                                <dd>
-                                    <a
-                                        :href="githubUrl"
-                                        target="_blank"
-                                        class="transition-colors hover:text-accent"
-                                    >
-                                        {{ displayName }}
-                                    </a>
-                                </dd>
+                                <dd>{{ displayName }}</dd>
                             </div>
                             <template v-if="character">
                                 <div class="flex justify-between gap-4">
@@ -398,22 +390,6 @@ function timeAgo(date: string | null): string {
                                         ·
                                         {{ timeAgo(latestRepository.pushedAt) }}
                                     </span>
-                                </dd>
-                            </div>
-                            <div class="flex justify-between gap-4">
-                                <dt
-                                    class="text-neutral-400 uppercase dark:text-neutral-500"
-                                >
-                                    Support
-                                </dt>
-                                <dd>
-                                    <a
-                                        href="https://www.patreon.com/NicolasKion"
-                                        target="_blank"
-                                        class="transition-colors hover:text-accent"
-                                    >
-                                        Patreon
-                                    </a>
                                 </dd>
                             </div>
                         </dl>
