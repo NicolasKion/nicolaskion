@@ -29,8 +29,13 @@ readonly class EveCharacter implements JsonSerializable
         return "https://zkillboard.com/character/{$this->id}/";
     }
 
+    public function eveWhoUrl(): string
+    {
+        return "https://evewho.com/character/{$this->id}";
+    }
+
     /**
-     * @return array{id: int, name: string, corporationName: string, corporationTicker: string, allianceName: string|null, allianceTicker: string|null, securityStatus: float, pilotSince: int, portraitUrl: string, zkillboardUrl: string}
+     * @return array{id: int, name: string, corporationName: string, corporationTicker: string, allianceName: string|null, allianceTicker: string|null, securityStatus: float, pilotSince: int, portraitUrl: string, zkillboardUrl: string, eveWhoUrl: string}
      */
     public function jsonSerialize(): array
     {
@@ -45,6 +50,7 @@ readonly class EveCharacter implements JsonSerializable
             'pilotSince' => $this->pilotSince,
             'portraitUrl' => $this->portraitUrl(),
             'zkillboardUrl' => $this->zkillboardUrl(),
+            'eveWhoUrl' => $this->eveWhoUrl(),
         ];
     }
 }

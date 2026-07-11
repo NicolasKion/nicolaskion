@@ -351,22 +351,6 @@ function timeAgo(date: string | null): string {
                                     </dt>
                                     <dd>{{ character.pilotSince }}</dd>
                                 </div>
-                                <div class="flex justify-between gap-4">
-                                    <dt
-                                        class="shrink-0 text-neutral-400 uppercase dark:text-neutral-500"
-                                    >
-                                        Killboard
-                                    </dt>
-                                    <dd>
-                                        <a
-                                            :href="character.zkillboardUrl"
-                                            target="_blank"
-                                            class="transition-colors hover:text-accent"
-                                        >
-                                            zKillboard
-                                        </a>
-                                    </dd>
-                                </div>
                             </template>
                             <div
                                 v-if="topLanguages.length > 0"
@@ -680,17 +664,44 @@ function timeAgo(date: string | null): string {
             </p>
 
             <footer
-                class="flex flex-wrap items-center gap-3 border-t border-neutral-200 pt-6 font-mono text-xs tracking-widest text-neutral-500 uppercase dark:border-neutral-800 dark:text-neutral-400"
+                class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-neutral-200 pt-6 font-mono text-xs tracking-widest text-neutral-500 uppercase dark:border-neutral-800 dark:text-neutral-400"
             >
                 <span class="text-accent">//</span>
                 <span>{{ displayName }}</span>
-                <a
-                    :href="githubUrl"
-                    target="_blank"
-                    class="ml-auto transition-colors hover:text-accent"
+                <span
+                    class="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2"
                 >
-                    github.com/{{ githubHandle }}
-                </a>
+                    <a
+                        :href="githubUrl"
+                        target="_blank"
+                        class="transition-colors hover:text-accent"
+                    >
+                        GitHub
+                    </a>
+                    <template v-if="character">
+                        <a
+                            :href="character.zkillboardUrl"
+                            target="_blank"
+                            class="transition-colors hover:text-accent"
+                        >
+                            zKillboard
+                        </a>
+                        <a
+                            :href="character.eveWhoUrl"
+                            target="_blank"
+                            class="transition-colors hover:text-accent"
+                        >
+                            EVE Who
+                        </a>
+                    </template>
+                    <a
+                        href="https://www.patreon.com/NicolasKion"
+                        target="_blank"
+                        class="transition-colors hover:text-accent"
+                    >
+                        Patreon
+                    </a>
+                </span>
             </footer>
         </div>
     </div>
