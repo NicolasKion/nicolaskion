@@ -90,7 +90,6 @@ const displayName = computed(
 const githubUrl = computed(
     () => props.profile?.htmlUrl ?? 'https://github.com/NicolasKion',
 );
-const githubHandle = computed(() => props.profile?.login ?? 'NicolasKion');
 
 const owners = computed(() => {
     const counts = new Map<string, Owner & { count: number }>();
