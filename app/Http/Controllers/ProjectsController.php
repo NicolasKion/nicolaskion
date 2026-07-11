@@ -12,23 +12,53 @@ use Inertia\Response;
 
 class ProjectsController extends Controller
 {
+    private const array NON_APP_LANGUAGES = ['Dockerfile', 'Shell', 'HTML', 'CSS'];
+
     public function __invoke(GitHub $github, Esi $esi): Response
     {
-        $repositories = $github->isConfigured()
-            ? array_values(array_filter(
-                $github->repositories(),
-                fn (GitHubRepository $repository): bool => ! $repository->isPrivate
-                    && ! $repository->isFork
-                    && ! str_starts_with($repository->name, '.'),
-            ))
-            : [];
+        $allRepositories = $github->isConfigured() ? $github->repositories() : [];
+
+        $repositories = array_values(array_filter(
+            $allRepositories,
+            fn (GitHubRepository $repository): bool => ! $repository->isPrivate
+                && ! $repository->isFork
+                && ! str_starts_with($repository->name, '.'),
+        ));
 
         return Inertia::render('Projects', [
             'profile' => $github->isConfigured() ? $github->profile() : null,
             'character' => $this->character($esi),
             'featured' => $this->featuredProjects($repositories),
             'repositories' => $repositories,
+            'stack' => $this->stackLanguages($allRepositories),
         ]);
+    }
+
+    /**
+     * Derived from all repositories, including private ones, so the
+     * stack reflects what is actually being built. Only language names
+     * are exposed to the page.
+     *
+     * @param  list<GitHubRepository>  $repositories
+     * @return list<string>
+     */
+    private function stackLanguages(array $repositories): array
+    {
+        $counts = [];
+
+        foreach ($repositories as $repository) {
+            $language = $repository->language;
+
+            if ($repository->isFork || $language === null || in_array($language, self::NON_APP_LANGUAGES, true)) {
+                continue;
+            }
+
+            $counts[$language] = ($counts[$language] ?? 0) + 1;
+        }
+
+        arsort($counts);
+
+        return array_slice(array_keys($counts), 0, 3);
     }
 
     /**

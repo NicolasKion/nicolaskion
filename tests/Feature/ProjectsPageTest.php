@@ -93,6 +93,7 @@ it('renders the landing page with public repositories and featured projects', fu
             ->where('featured.0.githubUrl', null)
             ->where('featured.1.githubUrl', 'https://github.com/WormholeSystems/killfeed')
             ->where('featured.1.stargazersCount', 5)
+            ->where('stack', ['Vue'])
         );
 });
 

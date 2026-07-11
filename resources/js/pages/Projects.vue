@@ -31,6 +31,7 @@ interface Character {
     pilotSince: number;
     portraitUrl: string;
     zkillboardUrl: string;
+    eveWhoUrl: string;
 }
 
 interface Owner {
@@ -62,6 +63,7 @@ const props = defineProps<{
     character: Character | null;
     featured: Featured[];
     repositories: Repository[];
+    stack: string[];
 }>();
 
 const search = ref('');
@@ -139,26 +141,6 @@ const totalStars = computed(() =>
         0,
     ),
 );
-
-const nonAppLanguages = new Set(['Dockerfile', 'Shell', 'HTML', 'CSS']);
-
-const topLanguages = computed(() => {
-    const counts = new Map<string, number>();
-
-    for (const repository of props.repositories) {
-        if (repository.language && !nonAppLanguages.has(repository.language)) {
-            counts.set(
-                repository.language,
-                (counts.get(repository.language) ?? 0) + 1,
-            );
-        }
-    }
-
-    return [...counts.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([language]) => language);
-});
 
 const latestRepository = computed(
     () =>
@@ -345,7 +327,7 @@ function timeAgo(date: string | null): string {
                                 </div>
                             </template>
                             <div
-                                v-if="topLanguages.length > 0"
+                                v-if="stack.length > 0"
                                 class="flex justify-between gap-4"
                             >
                                 <dt
@@ -353,7 +335,7 @@ function timeAgo(date: string | null): string {
                                 >
                                     Stack
                                 </dt>
-                                <dd>{{ topLanguages.join(' · ') }}</dd>
+                                <dd>{{ stack.join(' · ') }}</dd>
                             </div>
                             <div
                                 v-if="repositories.length > 0"
