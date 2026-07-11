@@ -27,7 +27,7 @@ return [
     |
     */
 
-    'description' => 'I make tools for EVE Online: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more.',
+    'description' => "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more.",
 
     /*
     |--------------------------------------------------------------------------
