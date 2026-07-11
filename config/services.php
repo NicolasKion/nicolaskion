@@ -20,6 +20,10 @@ return [
         'token' => env('GITHUB_TOKEN'),
     ],
 
+    'eve' => [
+        'character_id' => env('EVE_CHARACTER_ID'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

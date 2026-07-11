@@ -20,6 +20,19 @@ interface Featured {
     stargazersCount: number | null;
 }
 
+interface Character {
+    id: number;
+    name: string;
+    corporationName: string;
+    corporationTicker: string;
+    allianceName: string | null;
+    allianceTicker: string | null;
+    securityStatus: number;
+    pilotSince: number;
+    portraitUrl: string;
+    zkillboardUrl: string;
+}
+
 interface Owner {
     login: string;
     avatarUrl: string;
@@ -46,6 +59,7 @@ interface Repository {
 
 const props = defineProps<{
     profile: Profile | null;
+    character: Character | null;
     featured: Featured[];
     repositories: Repository[];
 }>();
@@ -249,7 +263,7 @@ function timeAgo(date: string | null): string {
                     </div>
 
                     <aside
-                        class="w-full shrink-0 rounded-lg border border-neutral-200 bg-white font-mono text-xs lg:w-80 dark:border-neutral-800 dark:bg-panel"
+                        class="w-full shrink-0 rounded-lg border border-neutral-200 bg-white font-mono text-xs lg:w-96 dark:border-neutral-800 dark:bg-panel"
                     >
                         <div
                             class="flex items-center gap-3 border-b border-neutral-200 px-5 py-3 tracking-widest uppercase dark:border-neutral-800"
@@ -259,8 +273,10 @@ function timeAgo(date: string | null): string {
                                 >Pilot dossier</span
                             >
                             <img
-                                v-if="profile"
-                                :src="profile.avatarUrl"
+                                v-if="character || profile"
+                                :src="
+                                    character?.portraitUrl ?? profile?.avatarUrl
+                                "
                                 :alt="displayName"
                                 class="ml-auto h-8 w-8 rounded-full border border-neutral-300 dark:border-neutral-700"
                             />
@@ -282,14 +298,76 @@ function timeAgo(date: string | null): string {
                                     </a>
                                 </dd>
                             </div>
-                            <div class="flex justify-between gap-4">
-                                <dt
-                                    class="text-neutral-400 uppercase dark:text-neutral-500"
+                            <template v-if="character">
+                                <div class="flex justify-between gap-4">
+                                    <dt
+                                        class="shrink-0 text-neutral-400 uppercase dark:text-neutral-500"
+                                    >
+                                        Corp
+                                    </dt>
+                                    <dd class="truncate">
+                                        {{ character.corporationName }} [{{
+                                            character.corporationTicker
+                                        }}]
+                                    </dd>
+                                </div>
+                                <div
+                                    v-if="character.allianceName"
+                                    class="flex justify-between gap-4"
                                 >
-                                    Focus
-                                </dt>
-                                <dd>EVE Online tooling</dd>
-                            </div>
+                                    <dt
+                                        class="shrink-0 text-neutral-400 uppercase dark:text-neutral-500"
+                                    >
+                                        Alliance
+                                    </dt>
+                                    <dd class="truncate">
+                                        {{ character.allianceName }} [{{
+                                            character.allianceTicker
+                                        }}]
+                                    </dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt
+                                        class="shrink-0 whitespace-nowrap text-neutral-400 uppercase dark:text-neutral-500"
+                                    >
+                                        Sec status
+                                    </dt>
+                                    <dd
+                                        :class="{
+                                            'text-red-500 dark:text-red-400':
+                                                character.securityStatus < 0,
+                                        }"
+                                    >
+                                        {{
+                                            character.securityStatus.toFixed(1)
+                                        }}
+                                    </dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt
+                                        class="shrink-0 whitespace-nowrap text-neutral-400 uppercase dark:text-neutral-500"
+                                    >
+                                        Pilot since
+                                    </dt>
+                                    <dd>{{ character.pilotSince }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <dt
+                                        class="shrink-0 text-neutral-400 uppercase dark:text-neutral-500"
+                                    >
+                                        Killboard
+                                    </dt>
+                                    <dd>
+                                        <a
+                                            :href="character.zkillboardUrl"
+                                            target="_blank"
+                                            class="transition-colors hover:text-accent"
+                                        >
+                                            zKillboard
+                                        </a>
+                                    </dd>
+                                </div>
+                            </template>
                             <div
                                 v-if="topLanguages.length > 0"
                                 class="flex justify-between gap-4"

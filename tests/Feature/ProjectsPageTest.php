@@ -136,6 +136,72 @@ it('renders without github data when no token is configured', function (): void 
         );
 });
 
+it('shows the eve character in the dossier', function (): void {
+    config()->set('services.github.token', 'fake-token');
+    config()->set('services.eve.character_id', 95569887);
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'api.github.com/user/repos*' => Http::response([gitHubRepository()]),
+        'api.github.com/user' => Http::response([
+            'login' => 'NicolasKion',
+            'name' => 'Nicolas Kion',
+            'avatar_url' => 'https://avatars.githubusercontent.com/u/172045106?v=4',
+            'html_url' => 'https://github.com/NicolasKion',
+        ]),
+        'esi.evetech.net/latest/characters/*' => Http::response([
+            'name' => 'Nicolas Kion',
+            'corporation_id' => 98630705,
+            'alliance_id' => 99014466,
+            'security_status' => -0.5,
+            'birthday' => '2015-05-05T14:16:51Z',
+        ]),
+        'esi.evetech.net/latest/corporations/*' => Http::response([
+            'name' => 'Strix Ridens',
+            'ticker' => 'OWL.',
+        ]),
+        'esi.evetech.net/latest/alliances/*' => Http::response([
+            'name' => 'Strix Ridens.',
+            'ticker' => 'STRIX',
+        ]),
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): AssertableInertia => $page
+            ->component('Projects')
+            ->where('character.name', 'Nicolas Kion')
+            ->where('character.corporationTicker', 'OWL.')
+            ->where('character.allianceName', 'Strix Ridens.')
+            ->where('character.securityStatus', -0.5)
+            ->where('character.pilotSince', 2015)
+            ->where('character.zkillboardUrl', 'https://zkillboard.com/character/95569887/')
+        );
+});
+
+it('renders without a character when esi is not configured', function (): void {
+    config()->set('services.github.token', 'fake-token');
+    config()->set('services.eve.character_id');
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'api.github.com/user/repos*' => Http::response([gitHubRepository()]),
+        'api.github.com/user' => Http::response([
+            'login' => 'NicolasKion',
+            'name' => 'Nicolas Kion',
+            'avatar_url' => 'https://avatars.githubusercontent.com/u/172045106?v=4',
+            'html_url' => 'https://github.com/NicolasKion',
+        ]),
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): AssertableInertia => $page
+            ->component('Projects')
+            ->where('character', null)
+        );
+});
+
 it('fetches repositories across multiple pages', function (): void {
     config()->set('services.github.token', 'fake-token');
 
