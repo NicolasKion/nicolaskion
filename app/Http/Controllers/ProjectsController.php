@@ -48,8 +48,13 @@ class ProjectsController extends Controller
 
         foreach ($repositories as $repository) {
             $language = $repository->language;
-
-            if ($repository->isFork || $language === null || in_array($language, self::NON_APP_LANGUAGES, true)) {
+            if ($repository->isFork) {
+                continue;
+            }
+            if ($language === null) {
+                continue;
+            }
+            if (in_array($language, self::NON_APP_LANGUAGES, true)) {
                 continue;
             }
 
