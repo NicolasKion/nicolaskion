@@ -25,8 +25,8 @@
         "eslint-plugin-vue": "^10.10.0",
         "prettier": "^3.9.6",
         "prettier-plugin-tailwindcss": "^0.8.1",
-        "typescript-eslint": "^8.66.0",
-        "vue-tsc": "^3.3.9"
+        "typescript-eslint": "^8.67.0",
+        "vue-tsc": "^3.3.10"
     },
     "dependencies": {
         "@inertiajs/vite": "^3.0.0",
@@ -34,8 +34,8 @@
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-vue": "^6.0.8",
         "clsx": "^2.1.1",
-        "concurrently": "^10.0.4",
-        "laravel-vite-plugin": "^3.1",
+        "concurrently": "^10.0.5",
+        "laravel-vite-plugin": "^3.2",
         "tailwind-merge": "^3.2.0",
         "tailwindcss": "^4.1.1",
         "typescript": "^6.0.3",
