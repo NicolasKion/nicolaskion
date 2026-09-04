@@ -229,3 +229,60 @@ it('fetches repositories across multiple pages', function (): void {
             ->has('repositories', 101)
         );
 });
+
+it('references existing logos and well-formed repositories in the featured config', function (): void {
+    /** @var list<array{name: string, logo: string|null, logo_dark?: string|null, repository: string|null}> $featured */
+    $featured = require config_path('projects.php');
+
+    foreach ($featured['featured'] as $project) {
+        foreach (array_filter([$project['logo'], $project['logo_dark'] ?? null]) as $logo) {
+            expect(public_path($logo))->toBeFile("{$project['name']} logo {$logo} is missing");
+        }
+
+        if ($project['repository'] !== null) {
+            expect($project['repository'])->toMatch('#^[\w.-]+/[\w.-]+$#');
+        }
+    }
+});
+
+it('links the mutamarket source once the repository is public', function (): void {
+    config()->set('services.github.token', 'fake-token');
+    config()->set('projects.featured', [
+        [
+            'name' => 'MutaMarket',
+            'description' => 'Open source marketplace.',
+            'logo' => '/logos/mutamarket.svg',
+            'site_url' => 'https://mutamarket.com',
+            'repository' => 'MutaMarket/MutaMarket',
+        ],
+    ]);
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'api.github.com/user/repos*' => Http::response([
+            gitHubRepository([
+                'name' => 'MutaMarket',
+                'full_name' => 'MutaMarket/MutaMarket',
+                'html_url' => 'https://github.com/MutaMarket/MutaMarket',
+                'language' => 'Rust',
+                'stargazers_count' => 3,
+            ]),
+        ]),
+        'api.github.com/user' => Http::response([
+            'login' => 'NicolasKion',
+            'name' => 'Nicolas Kion',
+            'avatar_url' => 'https://avatars.githubusercontent.com/u/172045106?v=4',
+            'html_url' => 'https://github.com/NicolasKion',
+        ]),
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): AssertableInertia => $page
+            ->component('Projects')
+            ->where('featured.0.name', 'MutaMarket')
+            ->where('featured.0.githubUrl', 'https://github.com/MutaMarket/MutaMarket')
+            ->where('featured.0.language', 'Rust')
+            ->where('featured.0.stargazersCount', 3)
+        );
+});

@@ -22,7 +22,7 @@ return [
             'description' => 'The marketplace for all your abyssal module needs in EVE Online. Trade, appraise, and browse mutated modules.',
             'logo' => '/logos/mutamarket.svg',
             'site_url' => 'https://mutamarket.com',
-            'repository' => null,
+            'repository' => 'MutaMarket/MutaMarket',
         ],
         [
             'name' => 'wormhole.systems',
