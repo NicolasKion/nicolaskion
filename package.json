@@ -16,14 +16,14 @@
         "@eslint/js": "^10.0.1",
         "@laravel/vite-plugin-wayfinder": "^0.1.10",
         "@stylistic/eslint-plugin": "^5.10.0",
-        "@types/node": "^26.5.1",
+        "@types/node": "^26.6.2",
         "@vue/eslint-config-typescript": "^14.9.0",
-        "eslint": "^10.10.0",
+        "eslint": "^10.11.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-import-resolver-typescript": "^4.4.5",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-vue": "^10.11.0",
-        "prettier": "^3.9.6",
+        "prettier": "^3.9.8",
         "prettier-plugin-tailwindcss": "^0.8.1",
         "typescript-eslint": "^8.70.0",
         "vue-tsc": "^3.3.11"
@@ -32,7 +32,7 @@
         "@inertiajs/vite": "^3.7.1",
         "@inertiajs/vue3": "^3.7.1",
         "@tailwindcss/vite": "^4.3.3",
-        "@vitejs/plugin-vue": "^6.0.8",
+        "@vitejs/plugin-vue": "^6.0.9",
         "clsx": "^2.1.1",
         "concurrently": "^10.0.5",
         "laravel-vite-plugin": "^3.2.0",
@@ -40,10 +40,10 @@
         "tailwindcss": "^4.1.1",
         "typescript": "^6.0.3",
         "vite": "^8.3.0",
-        "vue": "^3.5.42"
+        "vue": "^3.5.43"
     },
     "optionalDependencies": {
-        "@rollup/rollup-linux-x64-gnu": "4.63.2",
+        "@rollup/rollup-linux-x64-gnu": "4.63.4",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.33.0"
     },
