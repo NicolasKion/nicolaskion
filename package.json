@@ -16,21 +16,21 @@
         "@eslint/js": "^10.0.1",
         "@laravel/vite-plugin-wayfinder": "^0.1.10",
         "@stylistic/eslint-plugin": "^5.10.0",
-        "@types/node": "^26.6.3",
+        "@types/node": "^26.6.4",
         "@vue/eslint-config-typescript": "^14.9.0",
-        "eslint": "^10.11.0",
+        "eslint": "^10.12.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-import-resolver-typescript": "^4.4.5",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-vue": "^10.11.1",
         "prettier": "^3.9.9",
         "prettier-plugin-tailwindcss": "^0.8.1",
-        "typescript-eslint": "^8.70.1",
-        "vue-tsc": "^3.3.11"
+        "typescript-eslint": "^8.71.0",
+        "vue-tsc": "^3.3.12"
     },
     "dependencies": {
-        "@inertiajs/vite": "^3.7.1",
-        "@inertiajs/vue3": "^3.7.1",
+        "@inertiajs/vite": "^3.8.0",
+        "@inertiajs/vue3": "^3.8.0",
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-vue": "^6.0.9",
         "clsx": "^2.1.1",
@@ -39,7 +39,7 @@
         "tailwind-merge": "^3.7.0",
         "tailwindcss": "^4.1.1",
         "typescript": "^6.0.3",
-        "vite": "^8.3.1",
+        "vite": "^8.3.2",
         "vue": "^3.5.43"
     },
     "optionalDependencies": {
