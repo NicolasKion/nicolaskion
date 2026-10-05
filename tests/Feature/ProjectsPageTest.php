@@ -230,13 +230,18 @@ it('fetches repositories across multiple pages', function (): void {
         );
 });
 
-it('references existing logos and well-formed repositories in the featured config', function (): void {
-    /** @var list<array{name: string, logo: string|null, logo_dark?: string|null, repository: string|null}> $featured */
+it('references existing logos with sources and well-formed repositories in the featured config', function (): void {
+    /** @var list<array{name: string, logo: string|null, logo_source?: string, logo_dark?: string|null, logo_dark_source?: string, repository: string|null}> $featured */
     $featured = require config_path('projects.php');
 
     foreach ($featured['featured'] as $project) {
-        foreach (array_filter([$project['logo'], $project['logo_dark'] ?? null]) as $logo) {
-            expect(public_path($logo))->toBeFile("{$project['name']} logo {$logo} is missing");
+        foreach (['logo', 'logo_dark'] as $key) {
+            if (($project[$key] ?? null) === null) {
+                continue;
+            }
+
+            expect(public_path($project[$key]))->toBeFile("{$project['name']} logo {$project[$key]} is missing")
+                ->and($project["{$key}_source"] ?? null)->toStartWith('https://', "{$project['name']} {$key} has no source to sync from");
         }
 
         if ($project['repository'] !== null) {
