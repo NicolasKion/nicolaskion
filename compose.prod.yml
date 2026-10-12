@@ -1,0 +1,48 @@
+# Production on the shared server (TimKunze96/infra): only the api and the
+# frontend, from prebuilt images tagged with the commit (IMAGE_TAG in .env).
+# Caddy is the server's; both containers join its external `web` network,
+# where Caddy reaches them as nicolaskion-api and nicolaskion-frontend
+# (deploy/Caddyfile). No database: the GitHub and ESI data are cached in
+# the api's memory. The update feed is a host directory Caddy serves
+# itself (README, "Update feed"). Run from /opt/nicolaskion:
+#   docker compose -f compose.prod.yml up -d
+
+name: nicolaskion
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  api:
+    image: nicolaskion-api:${IMAGE_TAG:?set IMAGE_TAG in .env}
+    container_name: nicolaskion-api
+    # GITHUB_TOKEN and EVE_CHARACTER_ID.
+    env_file: .env
+    environment:
+      BIND_ADDR: 0.0.0.0:3000
+      APP_URL: https://nicolaskion.dev
+      RUST_LOG: ${RUST_LOG:-info}
+    networks:
+      - web
+    restart: unless-stopped
+    logging: *logging
+
+  frontend:
+    image: nicolaskion-frontend:${IMAGE_TAG:?set IMAGE_TAG in .env}
+    container_name: nicolaskion-frontend
+    environment:
+      AXUM_URL: http://nicolaskion-api:3000
+      ORIGIN: https://nicolaskion.dev
+    depends_on:
+      - api
+    networks:
+      - web
+    restart: unless-stopped
+    logging: *logging
+
+networks:
+  web:
+    external: true

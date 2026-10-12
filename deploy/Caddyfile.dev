@@ -1,0 +1,27 @@
+# The composed shared origin on :5314: the update feed from disk, backend
+# paths to the api container, page GETs to the SvelteKit node server. Keep
+# the path list in sync with frontend/proxy-paths.ts and deploy/Caddyfile.
+
+:5314 {
+	# Security headers on every answer.
+	header {
+		X-Frame-Options SAMEORIGIN
+		X-XSS-Protection "1; mode=block"
+		X-Content-Type-Options nosniff
+	}
+
+	handle_path /storage/tt-8d20886697466b8297bb6d6e1735fa53/* {
+		root * /srv/update-feed
+		@binary path *.gz *.sig
+		header @binary Content-Type application/octet-stream
+		file_server
+	}
+
+	handle {
+		encode zstd gzip
+		@axum path /api/* /storage/* /up
+		reverse_proxy @axum api:3000
+
+		reverse_proxy frontend:3000
+	}
+}

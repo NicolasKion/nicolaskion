@@ -1,0 +1,29 @@
+# The end-to-end setup: the api reads GitHub and ESI from a mock serving
+# tests/fixtures/upstream (scripts/laravel-reference/upstream.py, the same
+# mock the Laravel reference was recorded against), and Caddy serves the
+# fixture update feed.
+#   docker compose -f docker-compose.yml -f compose.e2e.yml up --build -d
+
+services:
+  upstream-mock:
+    image: python:3.14-slim
+    container_name: nicolaskion-upstream-mock-e2e
+    command: python3 -I /mock/upstream.py --host 0.0.0.0 --port 8399
+    environment:
+      UPSTREAM_FIXTURES: /fixtures
+    volumes:
+      - ./scripts/laravel-reference/upstream.py:/mock/upstream.py:ro
+      - ./tests/fixtures/upstream:/fixtures:ro
+
+  api:
+    environment:
+      GITHUB_TOKEN: e2e-token
+      GITHUB_API_URL: http://upstream-mock:8399/github
+      EVE_CHARACTER_ID: "95569887"
+      ESI_URL: http://upstream-mock:8399/esi
+    depends_on:
+      - upstream-mock
+
+  proxy:
+    volumes:
+      - ./tests/fixtures/update-feed:/srv/update-feed:ro

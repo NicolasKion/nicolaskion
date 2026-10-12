@@ -1,8 +1,10 @@
 name: logos
 
+# Once a month, downloads the featured project logos from their source
+# repositories (src/featured.rs) and opens a pull request when one changed.
 on:
   schedule:
-    - cron: '0 6 1 * *'
+    - cron: "0 6 1 * *"
   workflow_dispatch:
 
 permissions:
@@ -15,31 +17,22 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
         with:
-          php-version: '8.4'
+          shared-key: rust
+          save-if: false
 
-      - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-progress --prefer-dist
+      - name: Sync logos
+        run: cargo run --locked --bin sync_logos
 
-      - name: Prepare Environment
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Sync Logos
-        run: php artisan logos:sync
-
-      - name: Open Pull Request
+      - name: Open pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: chore/sync-logos
         run: |
-          if git diff --quiet -- public/logos; then
+          if git diff --quiet -- frontend/static/logos; then
             echo "Logos are up to date."
             exit 0
           fi
@@ -47,7 +40,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -C "$BRANCH"
-          git add public/logos
+          git add frontend/static/logos
           git commit -m "chore: sync featured project logos"
           git push --force origin "$BRANCH"
 

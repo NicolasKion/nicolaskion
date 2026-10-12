@@ -1,0 +1,45 @@
+[package]
+name = "nicolaskion"
+version = "0.1.0"
+edition = "2024"
+description = "nicolaskion.dev: Nicolas Kion's projects, GitHub repositories and EVE Online pilot dossier"
+default-run = "nicolaskion"
+
+[dependencies]
+axum = "0.8"
+dotenvy = "0.15"
+# Tells PNG and other binary images apart when the logos are synced
+# (src/logos.rs); SVG is text and checked by hand.
+infer = "0.19"
+reqwest = { version = "0.13", default-features = false, features = [
+    "rustls",
+    "query",
+    "json",
+    "gzip",
+] }
+serde = { version = "1", features = ["derive"] }
+# preserve_order keeps the props in the order the page lists them.
+serde_json = { version = "1", features = ["preserve_order"] }
+# The year of the character's birthday.
+time = { version = "0.3", features = ["parsing"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "net", "fs"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+http-body-util = "0.1"
+reqwest = { version = "0.13", default-features = false, features = ["json"] }
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }
+
+[[bin]]
+name = "nicolaskion"
+path = "src/main.rs"
+
+[[bin]]
+name = "sync_logos"
+path = "src/bin/sync_logos.rs"
+
+# Handlers return `Result<_, Response>`, as in MutaMarket.
+[lints.clippy]
+result_large_err = "allow"
