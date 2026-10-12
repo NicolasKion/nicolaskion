@@ -135,6 +135,17 @@ one full download.
 
 Tests: `update-feed.spec.ts`, `routing.test.ts`.
 
+### Trailing slashes
+
+Laravel: `/up/` answered like `/up` (the router ignores a trailing
+slash).
+
+Now: Caddy redirects `/up/` to `/up` with a 308, the way SvelteKit treats
+trailing slashes on pages. `/` is the only page.
+
+Test: `routes.spec.ts` "redirects the health page with a trailing slash
+to the slashless URL".
+
 ### Dropped dead code
 
 Laravel's `inspire` command, the starter kit's `Welcome.vue` (no route
@@ -149,3 +160,20 @@ Tests: `golden_http::storage_routes_answer_forbidden`,
 ## Needs owner decision
 
 Kept as Laravel has it, listed for the owner.
+
+- The cache lives in memory, as the plan proposed. Every deploy or
+  restart starts cold; the api fetches GitHub and ESI at startup, and if
+  that fails the page renders without them until a fetch works. A small
+  table would let the data survive restarts.
+- ESI is asked again after an hour, as Laravel did, although CCP caches
+  the character route for a day and asks clients not to fetch before
+  `Expires`. Raising the fresh window to a day would follow CCP's rule.
+- Every failed request is tried three times, 4xx answers included, so a
+  revoked GitHub token costs three requests per refresh.
+- Without a token the page tells visitors "GitHub token missing ... in
+  your `.env` file". Production always has a token, so only a broken
+  deploy would show it.
+- The upstream User-Agent names the site and this repository; CCP also
+  asks for a contact address, which only the owner can choose.
+- Plain http now redirects with Caddy's 308 instead of nginx's 301
+  (shared Caddy behavior, same for every site on the server).
