@@ -50,19 +50,83 @@ impl Upstream {
         Self { client, config }
     }
 
-    /// GETs `url` and decodes the JSON answer.
+    /// GETs `url` and decodes the JSON answer. Failed requests (no answer,
+    /// or a non-success status) are tried again after each retry delay;
+    /// an answer that does not decode is not.
     pub async fn get_json<T: DeserializeOwned>(
         &self,
-        _url: &str,
-        _query: &[(&str, &str)],
-        _headers: HeaderMap,
+        url: &str,
+        query: &[(&str, &str)],
+        headers: HeaderMap,
     ) -> Result<T, UpstreamError> {
-        let _ = (&self.client, &self.config);
-        Err(UpstreamError::Transport("not implemented".to_owned()))
+        let mut delays = self.config.retry_delays.iter();
+        loop {
+            let error = match self.attempt(url, query, headers.clone()).await {
+                Ok(response) => {
+                    let body = response
+                        .bytes()
+                        .await
+                        .map_err(|error| UpstreamError::Transport(error.to_string()));
+                    match body {
+                        Ok(body) => {
+                            return serde_json::from_slice(&body)
+                                .map_err(|error| UpstreamError::Decode(error.to_string()));
+                        }
+                        Err(error) => error,
+                    }
+                }
+                Err(error) => error,
+            };
+            match delays.next() {
+                Some(delay) => tokio::time::sleep(*delay).await,
+                None => return Err(error),
+            }
+        }
     }
 
-    /// GETs `url` and returns the status and the raw body.
-    pub async fn get_bytes(&self, _url: &str) -> Result<(u16, Vec<u8>), UpstreamError> {
-        Err(UpstreamError::Transport("not implemented".to_owned()))
+    /// GETs `url` and returns the status and the raw body of the last
+    /// attempt; failed answers are retried like `get_json`, and only a
+    /// request that never got an answer is an error.
+    pub async fn get_bytes(&self, url: &str) -> Result<(u16, Vec<u8>), UpstreamError> {
+        let mut delays = self.config.retry_delays.iter();
+        loop {
+            let outcome = match self.client.get(url).send().await {
+                Ok(response) => {
+                    let status = response.status().as_u16();
+                    match response.bytes().await {
+                        Ok(body) => Ok((status, body.to_vec())),
+                        Err(error) => Err(UpstreamError::Transport(error.to_string())),
+                    }
+                }
+                Err(error) => Err(UpstreamError::Transport(error.to_string())),
+            };
+            let failed = !matches!(&outcome, Ok((status, _)) if (200..300).contains(status));
+            match delays.next() {
+                Some(delay) if failed => tokio::time::sleep(*delay).await,
+                _ => return outcome,
+            }
+        }
+    }
+
+    /// One request; a non-success status is an error.
+    async fn attempt(
+        &self,
+        url: &str,
+        query: &[(&str, &str)],
+        headers: HeaderMap,
+    ) -> Result<reqwest::Response, UpstreamError> {
+        let response = self
+            .client
+            .get(url)
+            .query(query)
+            .headers(headers)
+            .send()
+            .await
+            .map_err(|error| UpstreamError::Transport(error.to_string()))?;
+        if response.status().is_success() {
+            Ok(response)
+        } else {
+            Err(UpstreamError::Status(response.status().as_u16()))
+        }
     }
 }

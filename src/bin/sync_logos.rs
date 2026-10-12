@@ -16,7 +16,11 @@ async fn main() -> ExitCode {
     let static_dir = std::env::var("STATIC_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from("frontend/static"));
-    let upstream = Upstream::new(UpstreamConfig::default());
+    // The downloads may take a while: 15 s each, like Laravel's command.
+    let upstream = Upstream::new(UpstreamConfig {
+        timeout: std::time::Duration::from_secs(15),
+        ..UpstreamConfig::default()
+    });
 
     let results = nicolaskion::logos::sync(&PROJECTS, &static_dir, &upstream).await;
     let mut failed = false;

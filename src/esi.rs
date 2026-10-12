@@ -5,11 +5,14 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use reqwest::header::{ACCEPT, HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize, Serializer};
+use time::OffsetDateTime;
+use time::format_description::well_known::Rfc3339;
 
 use crate::cache::{Clock, SwrCache};
 use crate::config::EsiConfig;
-use crate::upstream::Upstream;
+use crate::upstream::{Upstream, UpstreamError};
 
 pub const FRESH: Duration = Duration::from_secs(3600);
 pub const STALE: Duration = Duration::from_secs(86400);
@@ -60,28 +63,87 @@ pub struct EveCharacter {
 /// PHP's `json_encode` writes a float without a fraction as an integer
 /// (`0`, `-5`); the props keep that shape.
 fn php_float<S: Serializer>(value: &f64, serializer: S) -> Result<S::Ok, S::Error> {
-    serializer.serialize_f64(*value)
+    // Whole values within the exactly representable integers.
+    const LIMIT: f64 = 9_007_199_254_740_992.0;
+    if value.fract() == 0.0 && value.abs() < LIMIT {
+        serializer.serialize_i64(*value as i64)
+    } else {
+        serializer.serialize_f64(*value)
+    }
 }
 
 /// PHP's `round($value, 1)`: half away from zero, on the decimal value
-/// PHP prints (15 significant digits), so 0.35 rounds to 0.4.
+/// PHP prints (15 significant digits), so 0.35 rounds to 0.4 although the
+/// double is a hair below it.
 pub fn round_one_decimal(value: f64) -> f64 {
-    value
+    if !value.is_finite() || value == 0.0 {
+        return value;
+    }
+    // 15 significant digits: d.dddddddddddddde<exponent>.
+    let printed = format!("{:.14e}", value.abs());
+    let (mantissa, exponent) = printed.split_once('e').expect("exponent form");
+    let digits: u64 = mantissa.replace('.', "").parse().expect("digits");
+    let exponent: i32 = exponent.parse().expect("exponent");
+    // value * 10 = digits * 10^(exponent - 13)
+    let shift = exponent - 13;
+    let tenths = if shift >= 0 {
+        digits.saturating_mul(10u64.saturating_pow(shift as u32))
+    } else if shift < -18 {
+        0
+    } else {
+        let divisor = 10u64.pow((-shift) as u32);
+        let (quotient, remainder) = (digits / divisor, digits % divisor);
+        if remainder * 2 >= divisor {
+            quotient + 1
+        } else {
+            quotient
+        }
+    };
+    let rounded = tenths as f64 / 10.0;
+    if value < 0.0 { -rounded } else { rounded }
 }
 
-/// The year of an ESI birthday (`2015-05-05T14:16:51Z`), in UTC.
-pub fn birth_year(_birthday: &str) -> Option<i32> {
-    None
+/// The year of an ESI birthday (`2015-05-05T14:16:51Z`) in its own
+/// offset, as Carbon read it (ESI always answers in UTC).
+pub fn birth_year(birthday: &str) -> Option<i32> {
+    OffsetDateTime::parse(birthday, &Rfc3339)
+        .ok()
+        .map(OffsetDateTime::year)
 }
 
 /// PHP's `(int)` cast of the configured id: the leading integer, else 0.
-pub fn character_id(_configured: &str) -> i64 {
-    0
+pub fn character_id(configured: &str) -> i64 {
+    let text = configured.trim();
+    let (sign, digits) = match text.strip_prefix('-') {
+        Some(rest) => (-1, rest),
+        None => (1, text.strip_prefix('+').unwrap_or(text)),
+    };
+    let end = digits
+        .find(|c: char| !c.is_ascii_digit())
+        .unwrap_or(digits.len());
+    digits[..end].parse::<i64>().map_or(0, |id| sign * id)
 }
 
 impl EveCharacter {
-    pub fn from_data(_id: i64, _data: &CharacterData) -> Option<Self> {
-        None
+    /// The prop, `None` when the birthday does not parse.
+    pub fn from_data(id: i64, data: &CharacterData) -> Option<Self> {
+        let pilot_since = birth_year(&data.character.birthday)?;
+        Some(Self {
+            id,
+            name: data.character.name.clone(),
+            corporation_name: data.corporation.name.clone(),
+            corporation_ticker: data.corporation.ticker.clone(),
+            alliance_name: data.alliance.as_ref().map(|alliance| alliance.name.clone()),
+            alliance_ticker: data
+                .alliance
+                .as_ref()
+                .map(|alliance| alliance.ticker.clone()),
+            security_status: round_one_decimal(data.character.security_status.unwrap_or(0.0)),
+            pilot_since,
+            portrait_url: format!("https://images.evetech.net/characters/{id}/portrait?size=128"),
+            zkillboard_url: format!("https://zkillboard.com/character/{id}/"),
+            eve_who_url: format!("https://evewho.com/character/{id}"),
+        })
     }
 }
 
@@ -102,14 +164,63 @@ impl Esi {
     }
 
     pub fn is_configured(&self) -> bool {
-        self.config.character_id.is_some()
+        self.configured_id().is_some()
+    }
+
+    fn configured_id(&self) -> Option<i64> {
+        self.config
+            .character_id
+            .as_deref()
+            .map(str::trim)
+            .filter(|id| !id.is_empty())
+            .map(character_id)
     }
 
     /// The pilot, `None` when ESI is not configured or fails with nothing
     /// cached: the page renders without the dossier then.
     pub async fn character(&self) -> Option<EveCharacter> {
-        let _ = (&self.upstream, &self.cache);
-        None
+        let id = self.configured_id()?;
+        let esi = self.clone();
+        let data = self
+            .cache
+            .get(move || {
+                let esi = esi.clone();
+                async move { esi.fetch(id).await }
+            })
+            .await?;
+        let character = EveCharacter::from_data(id, &data);
+        if character.is_none() {
+            tracing::warn!(birthday = %data.character.birthday, "ESI birthday does not parse");
+        }
+        character
+    }
+
+    async fn get<T: serde::de::DeserializeOwned>(&self, route: &str) -> Result<T, UpstreamError> {
+        let mut headers = HeaderMap::new();
+        headers.insert(ACCEPT, HeaderValue::from_static("application/json"));
+        headers.insert(
+            "x-compatibility-date",
+            HeaderValue::from_static(COMPATIBILITY_DATE),
+        );
+        let url = format!("{}{route}", self.config.base_url);
+        self.upstream.get_json(&url, &[], headers).await
+    }
+
+    /// The character, then its corporation and its alliance, if any.
+    async fn fetch(&self, id: i64) -> Result<CharacterData, UpstreamError> {
+        let character: CharacterInfo = self.get(&format!("/characters/{id}")).await?;
+        let corporation: Named = self
+            .get(&format!("/corporations/{}", character.corporation_id))
+            .await?;
+        let alliance = match character.alliance_id {
+            Some(alliance_id) => Some(self.get(&format!("/alliances/{alliance_id}")).await?),
+            None => None,
+        };
+        Ok(CharacterData {
+            character,
+            corporation,
+            alliance,
+        })
     }
 }
 
@@ -138,10 +249,10 @@ mod tests {
     }
 
     #[test]
-    fn the_birth_year_is_read_in_utc() {
+    fn the_birth_year_is_read_in_its_own_offset() {
         assert_eq!(birth_year("2015-05-05T14:16:51Z"), Some(2015));
         assert_eq!(birth_year("2008-12-31T23:59:59Z"), Some(2008));
-        assert_eq!(birth_year("2008-12-31T23:30:00-01:00"), Some(2009));
+        assert_eq!(birth_year("2008-12-31T23:30:00-01:00"), Some(2008));
         assert_eq!(birth_year("2003-05-06T12:00:00.123Z"), Some(2003));
         assert_eq!(birth_year("not a date"), None);
     }

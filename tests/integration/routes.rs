@@ -21,7 +21,9 @@ async fn up_names_the_app() {
     let response = app.get("/up").await;
     assert_eq!(response.status, StatusCode::OK);
     assert!(
-        response.text().contains("<title>A &lt;b> &amp; C</title>"),
+        response
+            .text()
+            .contains("<title>A &lt;b&gt; &amp; C</title>"),
         "{}",
         response.text()
     );

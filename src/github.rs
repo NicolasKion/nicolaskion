@@ -4,11 +4,12 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use reqwest::header::{ACCEPT, AUTHORIZATION, HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 
 use crate::cache::{Clock, SwrCache};
 use crate::config::GitHubConfig;
-use crate::upstream::Upstream;
+use crate::upstream::{Upstream, UpstreamError};
 
 pub const FRESH: Duration = Duration::from_secs(600);
 pub const STALE: Duration = Duration::from_secs(3600);
@@ -75,22 +76,95 @@ impl GitHub {
         }
     }
 
-    /// Whether a token is set; without one GitHub is never asked.
+    /// Whether a token is set (and not blank); without one GitHub is
+    /// never asked.
     pub fn is_configured(&self) -> bool {
-        self.config.token.is_some()
+        self.token().is_some()
+    }
+
+    fn token(&self) -> Option<&str> {
+        self.config
+            .token
+            .as_deref()
+            .map(str::trim)
+            .filter(|token| !token.is_empty())
     }
 
     /// The token's user, `None` when GitHub is not configured or fails
     /// with nothing cached.
     pub async fn profile(&self) -> Option<Profile> {
-        let _ = (&self.upstream, &self.profile);
-        None
+        if !self.is_configured() {
+            return None;
+        }
+        let github = self.clone();
+        self.profile
+            .get(move || {
+                let github = github.clone();
+                async move { github.fetch_profile().await }
+            })
+            .await
     }
 
     /// Every repository the token's user owns or reaches through an
     /// organization, newest push first, private ones and forks included.
     pub async fn repositories(&self) -> Option<Vec<Repository>> {
-        let _ = &self.repositories;
-        None
+        if !self.is_configured() {
+            return None;
+        }
+        let github = self.clone();
+        self.repositories
+            .get(move || {
+                let github = github.clone();
+                async move { github.fetch_repositories().await }
+            })
+            .await
+    }
+
+    fn headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            ACCEPT,
+            HeaderValue::from_static("application/vnd.github+json"),
+        );
+        if let Some(token) = self.token()
+            && let Ok(value) = HeaderValue::from_str(&format!("Bearer {token}"))
+        {
+            headers.insert(AUTHORIZATION, value);
+        }
+        headers
+    }
+
+    async fn fetch_profile(&self) -> Result<Profile, UpstreamError> {
+        let url = format!("{}/user", self.config.api_url);
+        self.upstream.get_json(&url, &[], self.headers()).await
+    }
+
+    /// Page after page until one comes back shorter than `PER_PAGE`.
+    async fn fetch_repositories(&self) -> Result<Vec<Repository>, UpstreamError> {
+        let url = format!("{}/user/repos", self.config.api_url);
+        let per_page = PER_PAGE.to_string();
+        let mut repositories = Vec::new();
+        for page in 1.. {
+            let page = page.to_string();
+            let results: Vec<Repository> = self
+                .upstream
+                .get_json(
+                    &url,
+                    &[
+                        ("affiliation", "owner,organization_member"),
+                        ("sort", "pushed"),
+                        ("per_page", &per_page),
+                        ("page", &page),
+                    ],
+                    self.headers(),
+                )
+                .await?;
+            let last = results.len() < PER_PAGE;
+            repositories.extend(results);
+            if last {
+                break;
+            }
+        }
+        Ok(repositories)
     }
 }

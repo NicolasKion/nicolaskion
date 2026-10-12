@@ -16,12 +16,12 @@ async fn app_for(name: &str) -> TestApp {
     let (token, character, scenario) = match name {
         "unconfigured" => (None, None, "normal"),
         "blank-config" => (Some("   "), Some(" "), "normal"),
-        "full" => (Some("fake-token"), Some("95569887"), "normal"),
-        "no-character" => (Some("fake-token"), None, "normal"),
-        "no-alliance" => (Some("fake-token"), Some("95569887"), "no-alliance"),
-        "esi-down" => (Some("fake-token"), Some("95569887"), "esi-down"),
-        "paginated" => (Some("fake-token"), None, "paginated"),
-        "github-down" => (Some("fake-token"), Some("95569887"), "github-down"),
+        "full" => (Some("golden-token"), Some("95569887"), "normal"),
+        "no-character" => (Some("golden-token"), None, "normal"),
+        "no-alliance" => (Some("golden-token"), Some("95569887"), "no-alliance"),
+        "esi-down" => (Some("golden-token"), Some("95569887"), "esi-down"),
+        "paginated" => (Some("golden-token"), None, "paginated"),
+        "github-down" => (Some("golden-token"), Some("95569887"), "github-down"),
         other => panic!("no configuration for the golden page {other}"),
     };
     let app = TestApp::with(|config| {

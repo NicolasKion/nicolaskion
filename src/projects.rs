@@ -27,24 +27,67 @@ pub struct FeaturedProject {
 
 /// The repositories the page lists: public, not forks, and not dot
 /// repositories like `.github`, in GitHub's order.
-pub fn public_repositories(_all: &[Repository]) -> Vec<Repository> {
-    Vec::new()
+pub fn public_repositories(all: &[Repository]) -> Vec<Repository> {
+    all.iter()
+        .filter(|repository| {
+            !repository.is_private && !repository.is_fork && !repository.name.starts_with('.')
+        })
+        .cloned()
+        .collect()
 }
 
 /// The three most used languages over every repository the token sees,
 /// private ones included, forks and non-app languages left out. Ties keep
 /// the order the languages first appear in.
-pub fn stack_languages(_all: &[Repository]) -> Vec<String> {
-    Vec::new()
+pub fn stack_languages(all: &[Repository]) -> Vec<String> {
+    let mut counts: Vec<(&str, usize)> = Vec::new();
+    for repository in all {
+        let Some(language) = repository.language.as_deref() else {
+            continue;
+        };
+        if repository.is_fork || NON_APP_LANGUAGES.contains(&language) {
+            continue;
+        }
+        match counts.iter_mut().find(|(seen, _)| *seen == language) {
+            Some((_, count)) => *count += 1,
+            None => counts.push((language, 1)),
+        }
+    }
+    // A stable sort, like PHP's arsort: ties keep their order.
+    counts.sort_by_key(|&(_, count)| std::cmp::Reverse(count));
+    counts
+        .into_iter()
+        .take(3)
+        .map(|(language, _)| language.to_owned())
+        .collect()
 }
 
 /// The featured projects, each matched by exact `fullName` to a public
 /// repository.
 pub fn featured_projects(
-    _sources: &[FeaturedSource],
-    _public: &[Repository],
+    sources: &[FeaturedSource],
+    public: &[Repository],
 ) -> Vec<FeaturedProject> {
-    Vec::new()
+    sources
+        .iter()
+        .map(|source| {
+            let repository = source.repository.and_then(|full_name| {
+                public
+                    .iter()
+                    .find(|repository| repository.full_name == full_name)
+            });
+            FeaturedProject {
+                name: source.name.to_owned(),
+                description: source.description.to_owned(),
+                logo: source.logo.map(str::to_owned),
+                logo_dark: source.logo_dark.map(str::to_owned),
+                site_url: source.site_url.map(str::to_owned),
+                github_url: repository.map(|repository| repository.html_url.clone()),
+                language: repository.and_then(|repository| repository.language.clone()),
+                stargazers_count: repository.map(|repository| repository.stargazers_count),
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]
