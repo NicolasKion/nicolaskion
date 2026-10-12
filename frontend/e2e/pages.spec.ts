@@ -79,12 +79,9 @@ test('does not scroll sideways on a phone', async ({ page }) => {
 test('follows the system color scheme', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/');
-  const dark = await page.evaluate(
-    () => getComputedStyle(document.body.firstElementChild!).backgroundColor,
-  );
+  const root = page.locator('div.min-h-screen');
+  const background = () => root.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const dark = await background();
   await page.emulateMedia({ colorScheme: 'light' });
-  const light = await page.evaluate(
-    () => getComputedStyle(document.body.firstElementChild!).backgroundColor,
-  );
-  expect(dark).not.toBe(light);
+  expect(await background()).not.toBe(dark);
 });

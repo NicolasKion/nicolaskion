@@ -76,7 +76,13 @@ describe('filterRepositories', () => {
       language: 'Rust',
       topics: ['eve-online'],
     }),
-    repository({ id: 2, owner: 'NicolasKion', name: 'KillFeed', description: 'Killmails, LIVE' }),
+    repository({
+      id: 2,
+      owner: 'NicolasKion',
+      name: 'KillFeed',
+      description: 'Killmails, LIVE',
+      language: 'Vue',
+    }),
     repository({
       id: 3,
       owner: 'NicolasKion',

@@ -36,6 +36,10 @@ services:
     environment:
       AXUM_URL: http://nicolaskion-api:3000
       ORIGIN: https://nicolaskion.dev
+      # adapter-node takes the page origin (canonical URL, Inertia reloads)
+      # from the headers Caddy forwards; it no longer reads ORIGIN.
+      PROTOCOL_HEADER: x-forwarded-proto
+      HOST_HEADER: x-forwarded-host
     depends_on:
       - api
     networks:

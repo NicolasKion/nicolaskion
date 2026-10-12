@@ -10,9 +10,13 @@ test('answers unknown pages with the not found page', async ({ page }) => {
   }
 });
 
-test('redirects trailing slashes to the slashless URL', async ({ request }) => {
-  const response = await request.get('/does-not-exist/', { maxRedirects: 0 });
+// FIXES.md "Trailing slashes": Laravel answered /up/ like /up.
+test('redirects the health page with a trailing slash to the slashless URL', async ({
+  request,
+}) => {
+  const response = await request.get('/up/', { maxRedirects: 0 });
   expect(response.status()).toBe(308);
+  expect(new URL(response.headers()['location'], response.url()).pathname).toBe('/up');
 });
 
 test('sends the security headers', async ({ request }) => {

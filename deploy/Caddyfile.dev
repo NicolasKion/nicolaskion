@@ -19,6 +19,9 @@
 
 	handle {
 		encode zstd gzip
+		# Laravel answered /up/ like /up.
+		redir /up/ /up 308
+
 		@axum path /api/* /storage/* /up
 		reverse_proxy @axum api:3000
 

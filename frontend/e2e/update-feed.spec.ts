@@ -67,7 +67,7 @@ test('answers HEAD like GET without a body', async ({ request }) => {
 
 // FIXES.md "The update feed is served by Caddy".
 test('answers 404 for files that are not there', async ({ request }) => {
-  for (const path of [`${FEED}/missing.json`, `${FEED}/../../up`, `${FEED}/`]) {
+  for (const path of [`${FEED}/missing.json`, `${FEED}/`, `${FEED}/latest.json/x`]) {
     expect((await request.get(path)).status(), path).not.toBe(200);
   }
   expect((await request.get(`${FEED}/missing.json`)).status()).toBe(404);

@@ -3,8 +3,9 @@ import { AXUM_URL } from '$app/env/private';
 
 // Tabs left open on the Laravel site still send Inertia's XHR
 // (`X-Inertia: true`); a 409 with `X-Inertia-Location` makes Inertia load
-// the same URL in full, which is now this page. Fonts are preloaded like
-// the Laravel page did.
+// the same URL in full, which is now this page. Fonts are preloaded and
+// pages are kept out of shared caches (`no-cache, private`), like the
+// Laravel page did.
 export const handle: Handle = async ({ event, resolve }) => {
   if (event.request.headers.has('x-inertia')) {
     return new Response(null, {
@@ -12,10 +13,14 @@ export const handle: Handle = async ({ event, resolve }) => {
       headers: { 'x-inertia-location': event.url.href },
     });
   }
-  return resolve(event, {
+  const response = await resolve(event, {
     preload: ({ type, path }) =>
       type === 'js' || type === 'css' || (type === 'font' && path.endsWith('.woff2')),
   });
+  if (!response.headers.has('cache-control')) {
+    response.headers.set('cache-control', 'no-cache, private');
+  }
+  return response;
 };
 
 // Server-side loads reach Axum directly; the browser goes through the

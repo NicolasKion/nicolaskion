@@ -41,6 +41,10 @@ services:
     environment:
       AXUM_URL: http://api:3000
       ORIGIN: ${ORIGIN:-http://localhost:5314}
+      # adapter-node takes the page origin (canonical URL, Inertia reloads)
+      # from the headers Caddy forwards; it no longer reads ORIGIN.
+      PROTOCOL_HEADER: x-forwarded-proto
+      HOST_HEADER: x-forwarded-host
     depends_on:
       - api
     restart: unless-stopped

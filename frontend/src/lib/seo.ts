@@ -17,7 +17,34 @@ export type Head = {
 };
 
 /** The head for the site at `origin` (no trailing slash), named
- * `appName`. */
-export function pageHead(_input: { appName: string; origin: string }): Head {
-  return { title: '', meta: [], links: [] };
+ * `appName`. The canonical URL is the origin itself, as Laravel's
+ * `url('/')` wrote it. */
+export function pageHead({ appName, origin }: { appName: string; origin: string }): Head {
+  const social = `${appName} | ${TITLE}`;
+  const image = `${origin}/og-image.png`;
+  return {
+    title: `${TITLE} | ${appName}`,
+    meta: [
+      { name: 'description', content: DESCRIPTION },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: appName },
+      { property: 'og:title', content: social },
+      { property: 'og:description', content: DESCRIPTION },
+      { property: 'og:url', content: origin },
+      { property: 'og:image', content: image },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+      { property: 'og:image:alt', content: `${appName} logo` },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: social },
+      { name: 'twitter:description', content: DESCRIPTION },
+      { name: 'twitter:image', content: image },
+    ],
+    links: [
+      { rel: 'canonical', href: origin },
+      { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
+      { rel: 'icon', href: '/icon.png', type: 'image/png', sizes: '512x512' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
+  };
 }

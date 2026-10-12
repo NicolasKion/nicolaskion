@@ -10,6 +10,9 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [['list']],
+  // The visual baselines are the Laravel screenshots
+  // (scripts/laravel-reference/capture.mjs).
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.03 },
   },

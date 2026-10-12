@@ -41,8 +41,14 @@ export async function screenshotOptions(page: Page) {
 /** The SEO-relevant part of <head>: title, meta and link tags. */
 export async function readHead(page: Page) {
   return page.evaluate(() => {
+    // Event handler attributes (Svelte's onload replay on <link>) are not
+    // part of the head's content.
     const attributes = (element: Element) =>
-      Object.fromEntries([...element.attributes].map((a) => [a.name, a.value]));
+      Object.fromEntries(
+        [...element.attributes]
+          .filter((a) => !a.name.startsWith('on'))
+          .map((a) => [a.name, a.value]),
+      );
     return {
       title: document.title,
       lang: document.documentElement.lang,
