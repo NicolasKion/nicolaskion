@@ -1,0 +1,87 @@
+{
+  "title": "Tools for EVE Online | Nicolas Kion",
+  "lang": "en",
+  "meta": [
+    {
+      "name": "viewport",
+      "content": "width=device-width, initial-scale=1"
+    },
+    {
+      "name": "description",
+      "content": "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more."
+    },
+    {
+      "property": "og:type",
+      "content": "website"
+    },
+    {
+      "property": "og:site_name",
+      "content": "Nicolas Kion"
+    },
+    {
+      "property": "og:title",
+      "content": "Nicolas Kion | Tools for EVE Online"
+    },
+    {
+      "property": "og:description",
+      "content": "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more."
+    },
+    {
+      "property": "og:url",
+      "content": "http://127.0.0.1:8314"
+    },
+    {
+      "property": "og:image",
+      "content": "http://127.0.0.1:8314/og-image.png"
+    },
+    {
+      "property": "og:image:width",
+      "content": "1200"
+    },
+    {
+      "property": "og:image:height",
+      "content": "630"
+    },
+    {
+      "property": "og:image:alt",
+      "content": "Nicolas Kion logo"
+    },
+    {
+      "name": "twitter:card",
+      "content": "summary_large_image"
+    },
+    {
+      "name": "twitter:title",
+      "content": "Nicolas Kion | Tools for EVE Online"
+    },
+    {
+      "name": "twitter:description",
+      "content": "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more."
+    },
+    {
+      "name": "twitter:image",
+      "content": "http://127.0.0.1:8314/og-image.png"
+    }
+  ],
+  "links": [
+    {
+      "rel": "canonical",
+      "href": "http://127.0.0.1:8314"
+    },
+    {
+      "rel": "icon",
+      "href": "/favicon.ico",
+      "sizes": "any"
+    },
+    {
+      "rel": "icon",
+      "href": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "rel": "apple-touch-icon",
+      "href": "/apple-touch-icon.png"
+    }
+  ]
+}

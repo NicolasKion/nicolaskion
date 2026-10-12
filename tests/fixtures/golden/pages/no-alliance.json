@@ -1,0 +1,394 @@
+{
+  "path": "/",
+  "status": 200,
+  "page": {
+    "component": "Projects",
+    "props": {
+      "errors": {},
+      "name": "Nicolas Kion",
+      "auth": {
+        "user": null
+      },
+      "profile": {
+        "login": "NicolasKion",
+        "name": "Nicolas Kion",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/172045106?v=4",
+        "htmlUrl": "https://github.com/NicolasKion"
+      },
+      "character": {
+        "id": 95569887,
+        "name": "Nicolas Kion",
+        "corporationName": "Strix Ridens",
+        "corporationTicker": "OWL.",
+        "allianceName": null,
+        "allianceTicker": null,
+        "securityStatus": 0,
+        "pilotSince": 2008,
+        "portraitUrl": "https://images.evetech.net/characters/95569887/portrait?size=128",
+        "zkillboardUrl": "https://zkillboard.com/character/95569887/",
+        "eveWhoUrl": "https://evewho.com/character/95569887"
+      },
+      "featured": [
+        {
+          "name": "MutaMarket",
+          "description": "The marketplace for all your abyssal module needs in EVE Online. Trade, appraise, and browse mutated modules.",
+          "logo": "/logos/mutamarket.svg",
+          "logoDark": null,
+          "siteUrl": "https://mutamarket.com",
+          "githubUrl": "https://github.com/MutaMarket/MutaMarket",
+          "language": "Rust",
+          "stargazersCount": 12
+        },
+        {
+          "name": "wormhole.systems",
+          "description": "A collaborative wormhole mapping and tracking tool for EVE Online.",
+          "logo": "/logos/wormholesystems.png",
+          "logoDark": "/logos/wormholesystems-light.png",
+          "siteUrl": "https://wormhole.systems",
+          "githubUrl": "https://github.com/WormholeSystems/WormholeSystems",
+          "language": "PHP",
+          "stargazersCount": 40
+        },
+        {
+          "name": "EVE Wrench",
+          "description": "Backup, restore, and sync your EVE Online settings across accounts and characters.",
+          "logo": "/logos/evewrench.png",
+          "logoDark": null,
+          "siteUrl": null,
+          "githubUrl": null,
+          "language": null,
+          "stargazersCount": null
+        },
+        {
+          "name": "Log Analyzer",
+          "description": "Analyze your EVE Online combat logs, part of the Telescope toolkit.",
+          "logo": "/logos/loganalyzer.svg",
+          "logoDark": null,
+          "siteUrl": "https://loganalyzer.eve-telescope.com",
+          "githubUrl": "https://github.com/eve-telescope/loganalyzer",
+          "language": "PHP",
+          "stargazersCount": 3
+        },
+        {
+          "name": "Killfeed",
+          "description": "A real-time killmail feed for EVE Online at killfeed.killmail.space.",
+          "logo": "/logos/killfeed.svg",
+          "logoDark": null,
+          "siteUrl": "https://killfeed.killmail.space",
+          "githubUrl": "https://github.com/NicolasKion/KillFeed",
+          "language": "Vue",
+          "stargazersCount": 5
+        },
+        {
+          "name": "Telescope",
+          "description": "A local scanner tool for EVE Online.",
+          "logo": "/logos/telescope.png",
+          "logoDark": null,
+          "siteUrl": "https://eve-telescope.com",
+          "githubUrl": null,
+          "language": null,
+          "stargazersCount": null
+        },
+        {
+          "name": "Marketeer",
+          "description": "A desktop market tool for EVE Online that monitors your market exports, calculates competitive prices, and copies them to your clipboard.",
+          "logo": "/logos/marketeer.png",
+          "logoDark": null,
+          "siteUrl": null,
+          "githubUrl": "https://github.com/eve-marketeer/marketeer",
+          "language": "TypeScript",
+          "stargazersCount": 0
+        },
+        {
+          "name": "wormhole.systems Containers",
+          "description": "A Docker container setup to self-host a private wormhole.systems instance.",
+          "logo": "/logos/wormholesystems.png",
+          "logoDark": "/logos/wormholesystems-light.png",
+          "siteUrl": null,
+          "githubUrl": "https://github.com/WormholeSystems/wormholesystems-containers",
+          "language": "Dockerfile",
+          "stargazersCount": 2
+        }
+      ],
+      "repositories": [
+        {
+          "id": 101,
+          "name": "MutaMarket",
+          "fullName": "MutaMarket/MutaMarket",
+          "owner": {
+            "login": "MutaMarket",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1010?v=4"
+          },
+          "description": "The marketplace for abyssal modules in EVE Online.",
+          "htmlUrl": "https://github.com/MutaMarket/MutaMarket",
+          "homepage": "https://mutamarket.com",
+          "language": "Rust",
+          "stargazersCount": 12,
+          "forksCount": 2,
+          "openIssuesCount": 3,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-09-30T18:00:00Z",
+          "topics": [
+            "eve-online",
+            "rust",
+            "sveltekit"
+          ]
+        },
+        {
+          "id": 102,
+          "name": "WormholeSystems",
+          "fullName": "WormholeSystems/WormholeSystems",
+          "owner": {
+            "login": "WormholeSystems",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1015?v=4"
+          },
+          "description": "Collaborative wormhole mapping for EVE Online.",
+          "htmlUrl": "https://github.com/WormholeSystems/WormholeSystems",
+          "homepage": "",
+          "language": "PHP",
+          "stargazersCount": 40,
+          "forksCount": 9,
+          "openIssuesCount": 12,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-09-12T07:30:00Z",
+          "topics": []
+        },
+        {
+          "id": 106,
+          "name": "loganalyzer",
+          "fullName": "eve-telescope/loganalyzer",
+          "owner": {
+            "login": "eve-telescope",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1013?v=4"
+          },
+          "description": "Combat log analyzer, part of the Telescope toolkit.",
+          "htmlUrl": "https://github.com/eve-telescope/loganalyzer",
+          "homepage": "https://loganalyzer.eve-telescope.com",
+          "language": "PHP",
+          "stargazersCount": 3,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-07-15T12:00:00Z",
+          "topics": [
+            "eve-online",
+            "laravel"
+          ]
+        },
+        {
+          "id": 108,
+          "name": "KillFeed",
+          "fullName": "NicolasKion/KillFeed",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": null,
+          "htmlUrl": "https://github.com/NicolasKion/KillFeed",
+          "homepage": null,
+          "language": "Vue",
+          "stargazersCount": 5,
+          "forksCount": 1,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": true,
+          "pushedAt": "2021-06-01T00:00:00Z",
+          "topics": [
+            "killmails"
+          ]
+        },
+        {
+          "id": 109,
+          "name": "dotfiles",
+          "fullName": "NicolasKion/dotfiles",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": "Shell setup & <tools>.",
+          "htmlUrl": "https://github.com/NicolasKion/dotfiles",
+          "homepage": null,
+          "language": "Shell",
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-05-01T00:00:00Z",
+          "topics": []
+        },
+        {
+          "id": 110,
+          "name": "docker-images",
+          "fullName": "NicolasKion/docker-images",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": "Base images.",
+          "htmlUrl": "https://github.com/NicolasKion/docker-images",
+          "homepage": null,
+          "language": "Dockerfile",
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-04-01T00:00:00Z",
+          "topics": []
+        },
+        {
+          "id": 111,
+          "name": "marketeer",
+          "fullName": "eve-marketeer/marketeer",
+          "owner": {
+            "login": "eve-marketeer",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1013?v=4"
+          },
+          "description": "Desktop market helper.",
+          "htmlUrl": "https://github.com/eve-marketeer/marketeer",
+          "homepage": null,
+          "language": "TypeScript",
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-03-01T00:00:00Z",
+          "topics": [
+            "tauri"
+          ]
+        },
+        {
+          "id": 112,
+          "name": "wormholesystems-containers",
+          "fullName": "WormholeSystems/wormholesystems-containers",
+          "owner": {
+            "login": "WormholeSystems",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1015?v=4"
+          },
+          "description": "Self-host wormhole.systems.",
+          "htmlUrl": "https://github.com/WormholeSystems/wormholesystems-containers",
+          "homepage": null,
+          "language": "Dockerfile",
+          "stargazersCount": 2,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2021-02-01T00:00:00Z",
+          "topics": [
+            "docker"
+          ]
+        },
+        {
+          "id": 114,
+          "name": "nicolaskion",
+          "fullName": "NicolasKion/nicolaskion",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": "This site.",
+          "htmlUrl": "https://github.com/NicolasKion/nicolaskion",
+          "homepage": "https://nicolaskion.dev",
+          "language": "Vue",
+          "stargazersCount": 1,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2020-12-01T00:00:00Z",
+          "topics": []
+        },
+        {
+          "id": 115,
+          "name": "empty-repo",
+          "fullName": "NicolasKion/empty-repo",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": null,
+          "htmlUrl": "https://github.com/NicolasKion/empty-repo",
+          "homepage": null,
+          "language": null,
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": null,
+          "topics": []
+        },
+        {
+          "id": 116,
+          "name": "landing-css",
+          "fullName": "NicolasKion/landing-css",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": "Old styles.",
+          "htmlUrl": "https://github.com/NicolasKion/landing-css",
+          "homepage": null,
+          "language": "CSS",
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2020-06-01T00:00:00Z",
+          "topics": []
+        },
+        {
+          "id": 117,
+          "name": "static-pages",
+          "fullName": "NicolasKion/static-pages",
+          "owner": {
+            "login": "NicolasKion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/1011?v=4"
+          },
+          "description": "Old pages.",
+          "htmlUrl": "https://github.com/NicolasKion/static-pages",
+          "homepage": null,
+          "language": "HTML",
+          "stargazersCount": 0,
+          "forksCount": 0,
+          "openIssuesCount": 0,
+          "isPrivate": false,
+          "isFork": false,
+          "isArchived": false,
+          "pushedAt": "2020-05-01T00:00:00Z",
+          "topics": []
+        }
+      ],
+      "stack": [
+        "Rust",
+        "PHP",
+        "TypeScript"
+      ]
+    },
+    "url": "/",
+    "version": "ca9f98d296cccd9919f8652cf14b914a",
+    "sharedProps": [
+      "errors",
+      "name",
+      "auth"
+    ]
+  }
+}

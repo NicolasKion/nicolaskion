@@ -112,3 +112,98 @@ impl Esi {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn data(security_status: Option<f64>, alliance: bool) -> CharacterData {
+        CharacterData {
+            character: CharacterInfo {
+                name: "Nicolas Kion".to_owned(),
+                corporation_id: 98630705,
+                alliance_id: alliance.then_some(99014466),
+                security_status,
+                birthday: "2015-05-05T14:16:51Z".to_owned(),
+            },
+            corporation: Named {
+                name: "Strix Ridens".to_owned(),
+                ticker: "OWL.".to_owned(),
+            },
+            alliance: alliance.then(|| Named {
+                name: "Strix Ridens.".to_owned(),
+                ticker: "STRIX".to_owned(),
+            }),
+        }
+    }
+
+    #[test]
+    fn the_birth_year_is_read_in_utc() {
+        assert_eq!(birth_year("2015-05-05T14:16:51Z"), Some(2015));
+        assert_eq!(birth_year("2008-12-31T23:59:59Z"), Some(2008));
+        assert_eq!(birth_year("2008-12-31T23:30:00-01:00"), Some(2009));
+        assert_eq!(birth_year("2003-05-06T12:00:00.123Z"), Some(2003));
+        assert_eq!(birth_year("not a date"), None);
+    }
+
+    #[test]
+    fn the_character_id_is_read_like_a_php_int_cast() {
+        assert_eq!(character_id("95569887"), 95569887);
+        assert_eq!(character_id(" 95569887 "), 95569887);
+        assert_eq!(character_id("95569887abc"), 95569887);
+        assert_eq!(character_id("abc"), 0);
+        assert_eq!(character_id("-5"), -5);
+    }
+
+    #[test]
+    fn rounding_is_half_away_from_zero() {
+        assert_eq!(round_one_decimal(-0.45), -0.5);
+        assert_eq!(round_one_decimal(0.35), 0.4);
+        assert_eq!(round_one_decimal(2.25), 2.3);
+        assert_eq!(round_one_decimal(-2.25), -2.3);
+        assert_eq!(round_one_decimal(4.9999999), 5.0);
+        assert_eq!(round_one_decimal(0.04), 0.0);
+        assert!(round_one_decimal(-0.04).is_sign_negative());
+    }
+
+    #[test]
+    fn the_character_prop_is_built_from_the_three_answers() {
+        let character = EveCharacter::from_data(95569887, &data(Some(-0.45), true)).expect("built");
+        assert_eq!(
+            serde_json::to_value(&character).expect("json"),
+            serde_json::json!({
+                "id": 95569887,
+                "name": "Nicolas Kion",
+                "corporationName": "Strix Ridens",
+                "corporationTicker": "OWL.",
+                "allianceName": "Strix Ridens.",
+                "allianceTicker": "STRIX",
+                "securityStatus": -0.5,
+                "pilotSince": 2015,
+                "portraitUrl": "https://images.evetech.net/characters/95569887/portrait?size=128",
+                "zkillboardUrl": "https://zkillboard.com/character/95569887/",
+                "eveWhoUrl": "https://evewho.com/character/95569887",
+            })
+        );
+    }
+
+    #[test]
+    fn whole_security_statuses_are_written_as_integers() {
+        let json = |status| {
+            let character = EveCharacter::from_data(1, &data(status, false)).expect("built");
+            serde_json::to_value(&character).expect("json")["securityStatus"].to_string()
+        };
+        assert_eq!(json(None), "0");
+        assert_eq!(json(Some(4.99)), "5");
+        assert_eq!(json(Some(-10.0)), "-10");
+        assert_eq!(json(Some(-0.01)), "0");
+        assert_eq!(json(Some(1.25)), "1.3");
+    }
+
+    #[test]
+    fn a_birthday_that_does_not_parse_leaves_the_character_out() {
+        let mut data = data(None, false);
+        data.character.birthday = "yesterday".to_owned();
+        assert_eq!(EveCharacter::from_data(1, &data), None);
+    }
+}

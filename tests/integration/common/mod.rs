@@ -5,6 +5,7 @@
 // Not every suite uses every helper.
 #![allow(dead_code)]
 
+pub mod golden;
 pub mod upstream;
 
 use std::path::{Path, PathBuf};

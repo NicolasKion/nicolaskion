@@ -5,6 +5,9 @@
 #
 #   scripts/laravel-reference/run.sh setup   export main, patch, install, build assets
 #   scripts/laravel-reference/run.sh start   serve the reference and the mock upstream
+#   scripts/laravel-reference/run.sh start configured
+#                                            the same with GitHub and ESI configured
+#                                            (for capture.mjs; record.py switches itself)
 #   scripts/laravel-reference/run.sh stop
 #
 # The checkout lives in $LARAVEL_REF_DIR (default /tmp/nicolaskion-laravel-ref),
@@ -47,6 +50,10 @@ case "${1:-}" in
   start)
     "$0" stop
     cp "$repo/scripts/laravel-reference/env" "$dir/app/.env"
+    if [ "${2:-}" = configured ]; then
+      sed -i 's/^GITHUB_TOKEN=.*/GITHUB_TOKEN=golden-token/; s/^EVE_CHARACTER_ID=.*/EVE_CHARACTER_ID=95569887/' \
+        "$dir/app/.env"
+    fi
     rm -f "$dir/app/storage/logs/laravel.log"
     docker run -d --name nicolaskion-upstream-mock --network host \
       -v "$repo:/repo:ro" python:3.14-slim \
@@ -68,7 +75,7 @@ case "${1:-}" in
     docker rm -f nicolaskion-laravel-ref nicolaskion-upstream-mock >/dev/null 2>&1 || true
     ;;
   *)
-    sed -n '2,15p' "$0"
+    sed -n '2,18p' "$0"
     exit 1
     ;;
 esac

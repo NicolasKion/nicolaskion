@@ -1,0 +1,13 @@
+{
+  "path": "/",
+  "method": "GET",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null,
+  "cache_control": "no-cache, private",
+  "link": "<http://127.0.0.1:8314/build/assets/instrument-sans-400-normal-DRC__1Mx.woff2>; rel=\"preload\"; as=\"font\"; type=\"font/woff2\"; crossorigin=\"anonymous\", <http://127.0.0.1:8314/build/assets/instrument-sans-500-normal-Dk9ku72i.woff2>; rel=\"preload\"; as=\"font\"; type=\"font/woff2\"; crossorigin=\"anonymous\", <http://127.0.0.1:8314/build/assets/instrument-sans-600-normal-B7fBEWYG.woff2>; rel=\"preload\"; as=\"font\"; type=\"font/woff2\"; crossorigin=\"anonymous\", <http://127.0.0.1:8314/build/assets/app-CxjNaHMa.css>; rel=\"preload\"; as=\"style\", <http://127.0.0.1:8314/build/assets/app-BT61PGJH.js>; rel=\"modulepreload\"; as=\"script\", <http://127.0.0.1:8314/build/assets/Projects-BguZfADG.js>; rel=\"modulepreload\"; as=\"script\"",
+  "cookies": [
+    "XSRF-TOKEN",
+    "nicolas-kion-session"
+  ]
+}

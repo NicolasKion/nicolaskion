@@ -1,0 +1,35 @@
+[
+  {
+    "path": "/github/user/repos",
+    "query": {
+      "affiliation": "owner,organization_member",
+      "page": "1",
+      "per_page": "100",
+      "sort": "pushed"
+    },
+    "accept": "application/vnd.github+json",
+    "authorization": "Bearer golden-token"
+  },
+  {
+    "path": "/github/user/repos",
+    "query": {
+      "affiliation": "owner,organization_member",
+      "page": "1",
+      "per_page": "100",
+      "sort": "pushed"
+    },
+    "accept": "application/vnd.github+json",
+    "authorization": "Bearer golden-token"
+  },
+  {
+    "path": "/github/user/repos",
+    "query": {
+      "affiliation": "owner,organization_member",
+      "page": "1",
+      "per_page": "100",
+      "sort": "pushed"
+    },
+    "accept": "application/vnd.github+json",
+    "authorization": "Bearer golden-token"
+  }
+]
