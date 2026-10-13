@@ -37,7 +37,7 @@ vitest tests are `file "name"` under `frontend/src`, Playwright tests are
   character without alliance, the stack ordering.
 - The route contract (`routes`, `harness`, `routes.spec.ts`,
   `routing.test.ts`): health checks, 404 and 403 pages, the Inertia
-  reload, security headers, cookies, static files, the Caddyfiles.
+  reload, security headers, cookies, static files, the Caddyfile.
 - The update feed (`update-feed.spec.ts`): bytes, types, ranges,
   validators.
 - The page itself (`projects-page.svelte.test.ts`, `projects.test.ts`,

@@ -1,9 +1,22 @@
-# The production site block. The shared Caddy serves a copy of it from the
-# infra repo (TimKunze96/infra, sites/nicolaskion.dev.caddy); change both.
-# Same routing as Caddyfile.dev: keep the path list in sync with
-# frontend/proxy-paths.ts.
+# The shared origin, in production (the proxy image, deploy/Dockerfile,
+# behind Coolify's Traefik, which terminates TLS) and in the local stack
+# (docker-compose.yml, published on :5314). The update feed comes from
+# disk, backend paths go to the api, everything else to the SvelteKit node
+# server. Keep the path list in sync with frontend/proxy-paths.ts.
+{
+	# Traefik in front: keep its X-Forwarded-* headers, so the api and
+	# SvelteKit see the client's address, host and https.
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
 
-nicolaskion.dev {
+:80 {
+	# www.nicolaskion.dev, which Coolify routes here too, redirects to the
+	# apex.
+	@www header_regexp www Host ^www\.(.+)$
+	redir @www https://{re.www.1}{uri} permanent
+
 	header {
 		X-Frame-Options SAMEORIGIN
 		X-XSS-Protection "1; mode=block"
@@ -12,10 +25,10 @@ nicolaskion.dev {
 
 	# The tournament-tool update feed. Installed clients have this URL
 	# compiled in, so it is served straight from the host directory
-	# /opt/nicolaskion/update-feed (mounted read-only into the Caddy
-	# container at /srv/nicolaskion/update-feed), independent of the app
-	# containers. Archives and signatures go out as octet-stream, not
-	# application/gzip, and nothing here is compressed on the way.
+	# /srv/nicolaskion/update-feed (mounted read-only at the same path),
+	# independent of the app containers. Archives and signatures go out as
+	# octet-stream, not application/gzip, and nothing here is compressed
+	# on the way.
 	handle_path /storage/tt-8d20886697466b8297bb6d6e1735fa53/* {
 		root * /srv/nicolaskion/update-feed
 		@binary path *.gz *.sig
@@ -29,12 +42,8 @@ nicolaskion.dev {
 		redir /up/ /up 308
 
 		@axum path /api/* /storage/* /up
-		reverse_proxy @axum nicolaskion-api:3000
+		reverse_proxy @axum {$API_HOST:api}:3000
 
-		reverse_proxy nicolaskion-frontend:3000
+		reverse_proxy {$FRONTEND_HOST:frontend}:3000
 	}
-}
-
-www.nicolaskion.dev {
-	redir https://nicolaskion.dev{uri} permanent
 }

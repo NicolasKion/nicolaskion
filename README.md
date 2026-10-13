@@ -34,8 +34,8 @@ GitHub API.
 - Frontend: [SvelteKit](https://svelte.dev/docs/kit) (SSR, adapter-node),
   Svelte 5 and Tailwind CSS 4
 - Caddy in front: `/api/*`, `/storage/*` and `/up` go to the API,
-  everything else to SvelteKit. `frontend/proxy-paths.ts` and the two
-  Caddyfiles in `deploy/` hold that list.
+  everything else to SvelteKit. `frontend/proxy-paths.ts` and
+  `deploy/Caddyfile` hold that list.
 
 ## Layout
 
@@ -44,7 +44,7 @@ src/            the API: GitHub and ESI clients, the cache, the page props, the 
 src/bin/        sync_logos, downloads the featured project logos
 frontend/       the SvelteKit app and its Playwright suite (frontend/e2e)
 tests/          the Rust integration suites and the mock GitHub and ESI data
-deploy/         Caddyfiles for the local stack and production
+deploy/         the Caddyfile and the proxy image, shared by the local stack and production
 ```
 
 ## Running it
@@ -91,13 +91,12 @@ a logo changed.
 The tournament-tool desktop app checks
 `https://nicolaskion.dev/storage/tt-8d20886697466b8297bb6d6e1735fa53/latest.json`
 for updates; installed clients have that URL compiled in, so it must keep
-working. Caddy serves the directory straight from the host, independent
-of the app containers (`deploy/Caddyfile`):
+working. The proxy serves the directory straight from the host,
+independent of the api and the frontend (`deploy/Caddyfile`):
 
-- On the server the files live in `/opt/nicolaskion/update-feed`
+- On the server the files live in `/srv/nicolaskion/update-feed`
   (`latest.json`, `latest.json.sig` and the `update-v*` archives), mounted
-  read-only into the shared Caddy container at
-  `/srv/nicolaskion/update-feed`.
+  read-only into the proxy container at the same path.
 - tournament-tool's release workflow uploads new releases into that
   directory over rsync, with a key restricted to it.
 - Archives and the signature are served as `application/octet-stream`,
@@ -122,16 +121,11 @@ an ephemeral port. Playwright runs against the composed stack on port
 
 ## Deploying
 
-Production runs on a shared server whose Caddy serves several sites.
-`compose.prod.yml` starts only the API and the frontend, from images
-tagged with the commit, on the server's external `web` network:
-
-```bash
-docker build -t nicolaskion-api:$TAG .
-docker build -t nicolaskion-frontend:$TAG frontend
-# in /opt/nicolaskion, with IMAGE_TAG=$TAG, GITHUB_TOKEN and EVE_CHARACTER_ID in .env
-docker compose -f compose.prod.yml up -d
-```
-
-`deploy/Caddyfile` is the production site block, `www.nicolaskion.dev`
-included; the server's Caddy keeps a copy of it, so change both.
+Coolify deploys `compose.prod.yml` on the server. A merge to main runs
+`.github/workflows/release.yml`, which builds the api, frontend and proxy
+images, pushes them to `ghcr.io/nicolaskion/nicolaskion-*` (`latest` and
+the commit) and calls Coolify's deploy webhook, so Coolify pulls and
+restarts them. Only the proxy has a domain (https://nicolaskion.dev and
+www, which it redirects to the apex); Traefik terminates TLS in front of
+it. `GITHUB_TOKEN` and `EVE_CHARACTER_ID` are Coolify environment
+variables.

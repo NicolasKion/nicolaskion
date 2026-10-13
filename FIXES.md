@@ -126,7 +126,7 @@ from the `public/storage` symlink; a missing file fell through to
 Laravel's local disk route, which answered 403.
 
 Now: Caddy serves the directory straight from the host
-(`/opt/nicolaskion/update-feed`), independent of the app containers:
+(`/srv/nicolaskion/update-feed`), independent of the app containers:
 same bytes, `application/json` for `latest.json`, `application/octet-stream`
 for the signature and the archives, byte ranges, `Last-Modified` and
 conditional requests, no compression. A missing file is a 404, and the
@@ -175,5 +175,5 @@ Kept as Laravel has it, listed for the owner.
   deploy would show it.
 - The upstream User-Agent names the site and this repository; CCP also
   asks for a contact address, which only the owner can choose.
-- Plain http now redirects with Caddy's 308 instead of nginx's 301
-  (shared Caddy behavior, same for every site on the server).
+- Plain http to https is now Coolify's Traefik's redirect instead of
+  nginx's 301 (the same for every site on the server).

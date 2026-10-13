@@ -26,4 +26,4 @@ services:
 
   proxy:
     volumes:
-      - ./tests/fixtures/update-feed:/srv/update-feed:ro
+      - ./tests/fixtures/update-feed:/srv/nicolaskion/update-feed:ro

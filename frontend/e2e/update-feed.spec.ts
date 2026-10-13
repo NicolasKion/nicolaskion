@@ -1,7 +1,7 @@
 // The tournament-tool update feed: installed desktop clients have its URL
 // compiled in, so it must keep answering the same bytes, types, ranges
 // and validators. Caddy serves it from disk (tests/fixtures/update-feed in
-// the e2e stack, /opt/nicolaskion/update-feed in production).
+// the e2e stack, /srv/nicolaskion/update-feed in production).
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 

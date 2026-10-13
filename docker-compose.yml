@@ -56,15 +56,16 @@ services:
     logging: *logging
 
   proxy:
-    image: caddy:2
+    image: caddy:2.11.4
     container_name: nicolaskion-proxy
     ports:
-      - "127.0.0.1:5314:5314"
+      - "127.0.0.1:5314:80"
     volumes:
-      - ./deploy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      # The production Caddyfile, with its dev upstreams api and frontend.
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       # The tournament-tool update feed, served by Caddy from disk like in
       # production (UPDATE_FEED_DIR, an empty local directory by default).
-      - ${UPDATE_FEED_DIR:-./storage/update-feed}:/srv/update-feed:ro
+      - ${UPDATE_FEED_DIR:-./storage/update-feed}:/srv/nicolaskion/update-feed:ro
     depends_on:
       - api
       - frontend

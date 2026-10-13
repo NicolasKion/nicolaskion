@@ -38,14 +38,17 @@ browser at Axum's port directly. The setup mirrors MutaMarket
 - `frontend/src/lib/components/projects-page.svelte` is the page,
   `frontend/src/lib/projects.ts` its logic, `frontend/src/lib/seo.ts` the
   head. `frontend/proxy-paths.ts` is the routing contract, mirrored by
-  `deploy/Caddyfile.dev` and `deploy/Caddyfile` (`routing.test.ts`
-  checks).
+  `deploy/Caddyfile` (`routing.test.ts` checks). The same Caddyfile runs
+  locally and in the production proxy image.
 - The update feed under `/storage/tt-8d20886697466b8297bb6d6e1735fa53/`
   is served by Caddy from disk, never by the app. Installed clients have
   the URL compiled in: never move it.
 - Whole stack: `docker compose up --build` on http://localhost:5314
   (preview: https://nicolaskion.test).
 - `cargo run --bin sync_logos` downloads the featured logos.
+- Deploy: merge to main; GitHub Actions builds the api, frontend and
+  proxy images, pushes them to GHCR and Coolify redeploys
+  (`compose.prod.yml`).
 
 ## Migration from Laravel (removed before the merge to main)
 
