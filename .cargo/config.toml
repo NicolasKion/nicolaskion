@@ -1,0 +1,5 @@
+# The integration suites (tests/integration) share one process and start
+# mock servers per test; running them one at a time keeps their timing
+# assertions (cache windows, retries) honest.
+[env]
+RUST_TEST_THREADS = "1"

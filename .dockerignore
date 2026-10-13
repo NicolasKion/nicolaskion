@@ -1,0 +1,10 @@
+target
+frontend
+node_modules
+storage
+tests
+deploy
+scripts
+.git
+.claude
+*.md

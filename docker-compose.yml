@@ -1,0 +1,93 @@
+# The whole stack on http://localhost:5314:
+#   docker compose up --build
+# With the mock GitHub and ESI the end-to-end suite runs against:
+#   docker compose -f docker-compose.yml -f compose.e2e.yml up --build -d
+# Hot-reloading frontend instead of the built one:
+#   docker compose --profile dev up -d api frontend-dev
+#
+# The port is fixed so the stack runs next to other projects. GitHub and
+# ESI are only asked when GITHUB_TOKEN and EVE_CHARACTER_ID are set (.env
+# or the environment).
+
+name: nicolaskion
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  api:
+    build: .
+    container_name: nicolaskion-api
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      BIND_ADDR: 0.0.0.0:3000
+      RUST_LOG: ${RUST_LOG:-info}
+    restart: unless-stopped
+    develop:
+      watch:
+        - { action: rebuild, path: ./src }
+        - { action: rebuild, path: ./Cargo.toml }
+    logging: *logging
+
+  frontend:
+    build: ./frontend
+    container_name: nicolaskion-frontend
+    environment:
+      AXUM_URL: http://api:3000
+      ORIGIN: ${ORIGIN:-http://localhost:5314}
+      # adapter-node takes the page origin (the canonical URL)
+      # from the headers Caddy forwards; it no longer reads ORIGIN.
+      PROTOCOL_HEADER: x-forwarded-proto
+      HOST_HEADER: x-forwarded-host
+    depends_on:
+      - api
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend
+          ignore: [node_modules/, .svelte-kit/, build/]
+    logging: *logging
+
+  proxy:
+    image: caddy:2.11.4
+    container_name: nicolaskion-proxy
+    ports:
+      - "127.0.0.1:5314:80"
+    volumes:
+      # The production Caddyfile, with its dev upstreams api and frontend.
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # The tournament-tool update feed, served by Caddy from disk like in
+      # production (UPDATE_FEED_DIR, an empty local directory by default).
+      - ${UPDATE_FEED_DIR:-./storage/update-feed}:/srv/nicolaskion/update-feed:ro
+    depends_on:
+      - api
+      - frontend
+    restart: unless-stopped
+    logging: *logging
+
+  frontend-dev:
+    image: node:26
+    container_name: nicolaskion-frontend-dev
+    profiles: ["dev"]
+    working_dir: /app
+    command: sh -c "npm ci && npx vite dev --host 0.0.0.0 --port 5314"
+    environment:
+      AXUM_URL: http://api:3000
+      VITE_POLL_WATCH: "1"
+    ports:
+      - "127.0.0.1:5314:5314"
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - api
+    logging: *logging
+
+volumes:
+  frontend-node-modules:

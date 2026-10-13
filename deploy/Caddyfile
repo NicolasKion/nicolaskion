@@ -1,0 +1,49 @@
+# The shared origin, in production (the proxy image, deploy/Dockerfile,
+# behind Coolify's Traefik, which terminates TLS) and in the local stack
+# (docker-compose.yml, published on :5314). The update feed comes from
+# disk, backend paths go to the api, everything else to the SvelteKit node
+# server. Keep the path list in sync with frontend/proxy-paths.ts.
+{
+	# Traefik in front: keep its X-Forwarded-* headers, so the api and
+	# SvelteKit see the client's address, host and https.
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:80 {
+	# www.nicolaskion.dev, which Coolify routes here too, redirects to the
+	# apex.
+	@www header_regexp www Host ^www\.(.+)$
+	redir @www https://{re.www.1}{uri} permanent
+
+	header {
+		X-Frame-Options SAMEORIGIN
+		X-XSS-Protection "1; mode=block"
+		X-Content-Type-Options nosniff
+	}
+
+	# The tournament-tool update feed. Installed clients have this URL
+	# compiled in, so it is served straight from the host directory
+	# /srv/nicolaskion/update-feed (mounted read-only at the same path),
+	# independent of the app containers. Archives and signatures go out as
+	# octet-stream, not application/gzip, and nothing here is compressed
+	# on the way.
+	handle_path /storage/tt-8d20886697466b8297bb6d6e1735fa53/* {
+		root * /srv/nicolaskion/update-feed
+		@binary path *.gz *.sig
+		header @binary Content-Type application/octet-stream
+		file_server
+	}
+
+	handle {
+		encode zstd gzip
+		# /up/ is the health page too.
+		redir /up/ /up 308
+
+		@axum path /api/* /storage/* /up
+		reverse_proxy @axum {$API_HOST:api}:3000
+
+		reverse_proxy {$FRONTEND_HOST:frontend}:3000
+	}
+}

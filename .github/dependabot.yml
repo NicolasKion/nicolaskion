@@ -1,36 +1,40 @@
 version: 2
+
+# Once a month, one grouped PR per ecosystem for minor and patch updates.
+# Major updates come as their own PRs and are merged by hand.
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: cargo
+    directory: /
     schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 5
+      interval: monthly
     groups:
-      github-actions:
-        patterns:
-          - "*"
+      cargo-minor-and-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
 
-  - package-ecosystem: "composer"
-    directory: "/"
+  - package-ecosystem: npm
+    directory: /frontend
     schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 5
-    groups:
-      composer-minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 5
+      interval: monthly
     groups:
       npm-minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
+        applies-to: version-updates
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directories: [/, /frontend]
+    schedule:
+      interval: monthly
+    groups:
+      docker-minor-and-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions-minor-and-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]

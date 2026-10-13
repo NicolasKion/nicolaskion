@@ -1,0 +1,19 @@
+{
+  "version": "0.3.4",
+  "notes": "Fixture release for the end-to-end tests.\n\n- Not a real build.",
+  "pub_date": "2026-10-09T12:00:00Z",
+  "platforms": {
+    "linux-x86_64": {
+      "file": "update-v0.3.4-linux-x86_64.gz",
+      "sha256": "bb759949a15604a9e54c54b853cedfd5d924ff2d9a888800ff125f75d25969e2"
+    },
+    "macos-universal": {
+      "file": "update-v0.3.4-macos-universal.app.tar.gz",
+      "sha256": "9366742326c4448d23eec5464aff779a2553290b932a00b74bab3c3c66848ec4"
+    },
+    "windows-x86_64": {
+      "file": "update-v0.3.4-windows-x86_64.exe.gz",
+      "sha256": "25640e74af7ae3a9ccb3375d93f00c6d9948f96e51bd6a9357eebe1106de7fa4"
+    }
+  }
+}
