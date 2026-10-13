@@ -26,7 +26,6 @@ services:
         required: false
     environment:
       BIND_ADDR: 0.0.0.0:3000
-      APP_URL: ${APP_URL:-http://localhost:5314}
       RUST_LOG: ${RUST_LOG:-info}
     restart: unless-stopped
     develop:
@@ -41,7 +40,7 @@ services:
     environment:
       AXUM_URL: http://api:3000
       ORIGIN: ${ORIGIN:-http://localhost:5314}
-      # adapter-node takes the page origin (canonical URL, Inertia reloads)
+      # adapter-node takes the page origin (the canonical URL)
       # from the headers Caddy forwards; it no longer reads ORIGIN.
       PROTOCOL_HEADER: x-forwarded-proto
       HOST_HEADER: x-forwarded-host

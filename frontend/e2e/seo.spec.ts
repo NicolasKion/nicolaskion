@@ -1,25 +1,67 @@
-// The head, server rendered, against the head Laravel's page had in the
-// browser (tests/fixtures/golden/head/home.json).
-import { readFileSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+// The head in the server HTML, robots.txt and the font preloads.
+import { expect, test, type Page } from '@playwright/test';
 
-import { readHead } from './visual-pages.ts';
+const DESCRIPTION =
+  "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more.";
 
-const golden = JSON.parse(
-  readFileSync(new URL('../../tests/fixtures/golden/head/home.json', import.meta.url), 'utf8'),
-);
+/** The SEO-relevant part of <head>: title, meta and link tags. */
+async function readHead(page: Page) {
+  return page.evaluate(() => {
+    // Event handler attributes (Svelte's onload replay on <link>) are not
+    // part of the head's content.
+    const attributes = (element: Element) =>
+      Object.fromEntries(
+        [...element.attributes]
+          .filter((a) => !a.name.startsWith('on'))
+          .map((a) => [a.name, a.value]),
+      );
+    return {
+      title: document.title,
+      lang: document.documentElement.lang,
+      meta: [...document.head.querySelectorAll('meta')]
+        .map(attributes)
+        .filter((meta) => meta.name || meta.property),
+      links: [...document.head.querySelectorAll('link')]
+        .map(attributes)
+        .filter((link) => ['canonical', 'icon', 'apple-touch-icon'].includes(link.rel)),
+    };
+  });
+}
 
-test('writes the head like Laravel, in the server HTML', async ({ browser, baseURL }) => {
+test('writes the head in the server HTML', async ({ browser, baseURL }) => {
   // Without javascript: the head has to be in the server's HTML.
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('/');
-  const actual = await readHead(page);
-  // Laravel's url('/') is the request's origin; the golden head was
-  // captured from http://127.0.0.1:8314.
   const origin = new URL(baseURL!).origin;
-  const rebased = JSON.parse(JSON.stringify(golden).replaceAll('http://127.0.0.1:8314', origin));
-  expect(actual).toEqual(rebased);
+  const social = 'Nicolas Kion | Tools for EVE Online';
+  expect(await readHead(page)).toEqual({
+    title: 'Tools for EVE Online | Nicolas Kion',
+    lang: 'en',
+    meta: [
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'description', content: DESCRIPTION },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'Nicolas Kion' },
+      { property: 'og:title', content: social },
+      { property: 'og:description', content: DESCRIPTION },
+      { property: 'og:url', content: origin },
+      { property: 'og:image', content: `${origin}/og-image.png` },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+      { property: 'og:image:alt', content: 'Nicolas Kion logo' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: social },
+      { name: 'twitter:description', content: DESCRIPTION },
+      { name: 'twitter:image', content: `${origin}/og-image.png` },
+    ],
+    links: [
+      { rel: 'canonical', href: origin },
+      { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
+      { rel: 'icon', href: '/icon.png', type: 'image/png', sizes: '512x512' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
+  });
   await context.close();
 });
 

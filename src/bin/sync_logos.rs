@@ -16,7 +16,7 @@ async fn main() -> ExitCode {
     let static_dir = std::env::var("STATIC_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from("frontend/static"));
-    // The downloads may take a while: 15 s each, like Laravel's command.
+    // The downloads may take a while: 15 s each.
     let upstream = Upstream::new(UpstreamConfig {
         timeout: std::time::Duration::from_secs(15),
         ..UpstreamConfig::default()

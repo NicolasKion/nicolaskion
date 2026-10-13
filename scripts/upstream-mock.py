@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """A mock of the GitHub and ESI endpoints the site reads, serving
-tests/fixtures/upstream. Used by the Laravel reference (run.sh start) and
-by the composed stack in the end-to-end suite (compose.e2e.yml); the Rust
+tests/fixtures/upstream. Used by the composed stack in the end-to-end
+suite (compose.e2e.yml); the Rust
 suites have their own mock over the same files
 (tests/integration/common/upstream.rs).
 
-    python3 -I scripts/laravel-reference/upstream.py --port 8399
+    python3 -I scripts/upstream-mock.py --port 8399
 
 Routes, under /github and /esi:
 
     GET /github/user, GET /github/user/repos?page=N
     GET /esi/characters/{id}, /esi/corporations/{id}, /esi/alliances/{id}
-        (also with Laravel's /latest prefix and trailing slash)
 
 Control routes:
 
@@ -79,7 +78,6 @@ def github(path, query, scenario):
 def esi(path, scenario):
     if scenario == "esi-down":
         return 503, {"error": "The service is unavailable"}
-    path = re.sub(r"^/latest", "", path).rstrip("/")
     match = re.fullmatch(r"/(characters|corporations|alliances)/(\d+)", path)
     if not match:
         return 404, {"error": "Not found"}

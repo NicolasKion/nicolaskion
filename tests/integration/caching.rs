@@ -1,6 +1,6 @@
 //! The stale-while-revalidate caches: GitHub 10 minutes fresh and an hour
-//! stale, ESI an hour fresh and a day stale, as Laravel's
-//! `Cache::flexible` had them. The test clock steps through the windows.
+//! stale, ESI an hour fresh and a day stale. The test clock steps through
+//! the windows.
 
 use std::time::Duration;
 
@@ -108,9 +108,8 @@ async fn a_failed_refresh_keeps_the_stale_data() {
     );
 }
 
-/// FIXES.md "A failed refresh after the stale window lost the data":
-/// past the stale window a failing upstream no longer empties the page;
-/// the last data is served until a fetch succeeds.
+/// Past the stale window a failing upstream does not empty the page: the
+/// last data is served until a fetch succeeds.
 #[tokio::test]
 async fn expired_data_is_served_when_the_refresh_fails() {
     let app = TestApp::new().await;
@@ -144,8 +143,8 @@ async fn a_failure_is_not_cached() {
     assert_eq!(app.home().await["profile"]["login"], "NicolasKion");
 }
 
-/// FIXES.md "A malformed answer broke the page for an hour": an answer
-/// that does not have the expected shape is a failure, never cached.
+/// An answer that does not have the expected shape is a failure, never
+/// cached.
 #[tokio::test]
 async fn a_malformed_answer_is_not_cached() {
     let app = TestApp::new().await;

@@ -1,15 +1,16 @@
-//! Port of tests/Feature/ProjectsPageTest.php and ExampleTest.php: the
-//! landing page props against the mock GitHub and ESI, with the two
-//! featured projects of the PHP suite's `beforeEach`.
+//! The landing page props against the mock GitHub and ESI, mostly with
+//! the two featured projects of `test_featured`.
 
 use axum::http::StatusCode;
 use serde_json::{Value, json};
 
 use nicolaskion::featured::{FeaturedSource, PROJECTS};
 
-use crate::common::{CHARACTER_ID, Service, TestApp, repo_path, test_featured};
+use crate::common::{
+    CHARACTER_ID, Service, TestApp, assert_json_eq, key_paths, repo_path, test_featured,
+};
 
-/// The PHP suite's `gitHubRepository()` with overrides.
+/// A GitHub repository answer with overrides.
 fn github_repository(overrides: Value) -> Value {
     let mut repository = json!({
         "id": 1,
@@ -62,7 +63,142 @@ async fn app_with_repositories(repositories: Vec<Value>) -> TestApp {
     app
 }
 
-/// ExampleTest "returns a successful response": the page's props load.
+/// Every prop with its exact keys, in order, and the values mapped from
+/// the GitHub and ESI answers.
+#[tokio::test]
+async fn the_props_have_their_exact_shape_and_key_order() {
+    let app = TestApp::with(|config| {
+        config.featured = vec![
+            FeaturedSource {
+                logo: Some("/logos/wormholesystems.png"),
+                logo_dark: Some("/logos/wormholesystems-light.png"),
+                site_url: Some("https://wormhole.systems"),
+                repository: Some("WormholeSystems/killfeed"),
+                ..FeaturedSource::new("wormhole.systems", "Wormhole mapping.")
+            },
+            FeaturedSource::new("EVE Wrench", "Settings sync."),
+        ];
+    })
+    .await;
+    app.upstream.change(|data| {
+        data.user = profile();
+        data.repositories = vec![
+            github_repository(json!({
+                "homepage": "https://killfeed.example",
+                "topics": ["eve-online", "rust"],
+                "stargazers_count": 40,
+                "forks_count": 9,
+                "open_issues_count": 12,
+            })),
+            github_repository(json!({
+                "id": 2,
+                "name": "old",
+                "full_name": "NicolasKion/old",
+                "owner": { "login": "NicolasKion", "avatar_url": "https://avatars.example/2" },
+                "description": null,
+                "html_url": "https://github.com/NicolasKion/old",
+                "homepage": "",
+                "language": null,
+                "archived": true,
+                "pushed_at": "2021-09-12T07:30:00Z",
+            })),
+        ];
+    });
+
+    let expected = json!({
+        "name": "Nicolas Kion",
+        "auth": { "user": null },
+        "githubConfigured": true,
+        "profile": {
+            "login": "NicolasKion",
+            "name": "Nicolas Kion",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/172045106?v=4",
+            "htmlUrl": "https://github.com/NicolasKion",
+        },
+        "character": {
+            "id": 95569887,
+            "name": "Nicolas Kion",
+            "corporationName": "Strix Ridens",
+            "corporationTicker": "OWL.",
+            "allianceName": "Strix Ridens.",
+            "allianceTicker": "STRIX",
+            "securityStatus": -0.5,
+            "pilotSince": 2015,
+            "portraitUrl": "https://images.evetech.net/characters/95569887/portrait?size=128",
+            "zkillboardUrl": "https://zkillboard.com/character/95569887/",
+            "eveWhoUrl": "https://evewho.com/character/95569887",
+        },
+        "featured": [
+            {
+                "name": "wormhole.systems",
+                "description": "Wormhole mapping.",
+                "logo": "/logos/wormholesystems.png",
+                "logoDark": "/logos/wormholesystems-light.png",
+                "siteUrl": "https://wormhole.systems",
+                "githubUrl": "https://github.com/WormholeSystems/killfeed",
+                "language": "Vue",
+                "stargazersCount": 40,
+            },
+            {
+                "name": "EVE Wrench",
+                "description": "Settings sync.",
+                "logo": null,
+                "logoDark": null,
+                "siteUrl": null,
+                "githubUrl": null,
+                "language": null,
+                "stargazersCount": null,
+            },
+        ],
+        "repositories": [
+            {
+                "id": 1,
+                "name": "killfeed",
+                "fullName": "WormholeSystems/killfeed",
+                "owner": {
+                    "login": "WormholeSystems",
+                    "avatarUrl": "https://avatars.githubusercontent.com/u/1?v=4",
+                },
+                "description": "A killmail feed",
+                "htmlUrl": "https://github.com/WormholeSystems/killfeed",
+                "homepage": "https://killfeed.example",
+                "language": "Vue",
+                "stargazersCount": 40,
+                "forksCount": 9,
+                "openIssuesCount": 12,
+                "isPrivate": false,
+                "isFork": false,
+                "isArchived": false,
+                "pushedAt": "2026-07-01T00:00:00Z",
+                "topics": ["eve-online", "rust"],
+            },
+            {
+                "id": 2,
+                "name": "old",
+                "fullName": "NicolasKion/old",
+                "owner": { "login": "NicolasKion", "avatarUrl": "https://avatars.example/2" },
+                "description": null,
+                "htmlUrl": "https://github.com/NicolasKion/old",
+                "homepage": "",
+                "language": null,
+                "stargazersCount": 5,
+                "forksCount": 0,
+                "openIssuesCount": 0,
+                "isPrivate": false,
+                "isFork": false,
+                "isArchived": true,
+                "pushedAt": "2021-09-12T07:30:00Z",
+                "topics": [],
+            },
+        ],
+        "stack": ["Vue"],
+    });
+    let actual = app.home().await;
+    assert_json_eq(&expected, &actual);
+    assert_eq!(key_paths(&actual), key_paths(&expected));
+}
+
+/// The page's props load.
 #[tokio::test]
 async fn returns_a_successful_response() {
     let app = TestApp::new().await;
@@ -281,7 +417,8 @@ async fn featured_repositories_match_their_full_name_exactly() {
     assert_eq!(app.home().await["featured"][1]["githubUrl"], Value::Null);
 }
 
-/// FIXES.md "A GitHub failure with nothing cached was a 500".
+/// A GitHub failure with nothing cached renders the page without GitHub
+/// and with the dossier from ESI.
 #[tokio::test]
 async fn a_github_failure_with_nothing_cached_renders_without_github() {
     let app = TestApp::with(|config| config.featured = test_featured()).await;
@@ -313,7 +450,7 @@ async fn a_failing_profile_keeps_the_repositories() {
     );
 }
 
-/// An ESI failure leaves the dossier out, like Laravel's `rescue`.
+/// An ESI failure leaves the dossier out.
 #[tokio::test]
 async fn an_esi_failure_renders_without_a_character() {
     for status in [404, 420, 500, 503] {
@@ -326,8 +463,8 @@ async fn an_esi_failure_renders_without_a_character() {
 }
 
 /// A character without an alliance or a security status: no alliance
-/// request, null alliance fields, a security status of 0 (an integer, as
-/// PHP encoded the float 0.0).
+/// request, null alliance fields, a security status of 0 (written as an
+/// integer).
 #[tokio::test]
 async fn a_character_without_alliance_or_security_status() {
     let app = TestApp::new().await;

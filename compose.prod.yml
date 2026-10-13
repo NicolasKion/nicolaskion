@@ -31,7 +31,6 @@ services:
     pull_policy: always
     environment:
       BIND_ADDR: 0.0.0.0:3000
-      APP_URL: ${APP_URL:-https://nicolaskion.dev}
       APP_NAME: ${APP_NAME:-}
       RUST_LOG: ${RUST_LOG:-info}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
@@ -58,7 +57,7 @@ services:
     environment:
       AXUM_URL: http://nicolaskion-api:3000
       ORIGIN: ${APP_URL:-https://nicolaskion.dev}
-      # adapter-node takes the page origin (canonical URL, Inertia reloads)
+      # adapter-node takes the page origin (the canonical URL)
       # from the headers the proxy forwards.
       PROTOCOL_HEADER: x-forwarded-proto
       HOST_HEADER: x-forwarded-host

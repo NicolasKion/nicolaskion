@@ -1,18 +1,9 @@
 import type { Handle, HandleFetch } from '@sveltejs/kit/hooks';
 import { AXUM_URL } from '$app/env/private';
 
-// Tabs left open on the Laravel site still send Inertia's XHR
-// (`X-Inertia: true`); a 409 with `X-Inertia-Location` makes Inertia load
-// the same URL in full, which is now this page. Fonts are preloaded and
-// pages are kept out of shared caches (`no-cache, private`), like the
-// Laravel page did.
+// Fonts are preloaded and pages are kept out of shared caches
+// (`no-cache, private`).
 export const handle: Handle = async ({ event, resolve }) => {
-  if (event.request.headers.has('x-inertia')) {
-    return new Response(null, {
-      status: 409,
-      headers: { 'x-inertia-location': event.url.href },
-    });
-  }
   const response = await resolve(event, {
     preload: ({ type, path }) =>
       type === 'js' || type === 'css' || (type === 'font' && path.endsWith('.woff2')),

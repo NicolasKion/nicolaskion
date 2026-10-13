@@ -10,10 +10,6 @@ pub mod storage;
 use std::sync::Arc;
 
 use axum::Router;
-use axum::extract::{Request, State};
-use axum::http::{Method, StatusCode, header};
-use axum::middleware::Next;
-use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 
 use crate::cache::Clock;
@@ -80,10 +76,6 @@ pub fn router(state: AppState) -> Router {
         )
         .nest("/api", api_router())
         .fallback(errors::not_found)
-        .layer(axum::middleware::from_fn_with_state(
-            state.clone(),
-            reload_inertia_requests,
-        ))
         .with_state(state)
 }
 
@@ -91,47 +83,4 @@ fn api_router() -> Router<AppState> {
     Router::new()
         .route("/health", get(health::health))
         .route("/pages/home", get(pages::home))
-}
-
-/// Tabs left open on the Laravel site still send Inertia's XHR
-/// (`X-Inertia: true`). A 409 with `X-Inertia-Location` makes Inertia load
-/// that URL in full: the same URL for a GET, the page the request came
-/// from (its Referer, or the home page) for anything else.
-async fn reload_inertia_requests(
-    State(state): State<AppState>,
-    request: Request,
-    next: Next,
-) -> Response {
-    if !request.headers().contains_key("x-inertia") {
-        return next.run(request).await;
-    }
-    let headers = request.headers();
-    let location = if matches!(*request.method(), Method::GET | Method::HEAD) {
-        let scheme = headers
-            .get("x-forwarded-proto")
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or_else(|| state.config.app_url.split("://").next().unwrap_or("https"));
-        let host = headers
-            .get(header::HOST)
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or_default();
-        let path = request
-            .uri()
-            .path_and_query()
-            .map_or("/", |path| path.as_str());
-        format!("{scheme}://{host}{path}")
-    } else {
-        headers
-            .get(header::REFERER)
-            .and_then(|value| value.to_str().ok())
-            .filter(|referer| referer.starts_with(&state.config.app_url))
-            .map_or_else(|| format!("{}/", state.config.app_url), str::to_owned)
-    };
-    let mut response = StatusCode::CONFLICT.into_response();
-    if let Ok(location) = location.parse() {
-        response
-            .headers_mut()
-            .insert("x-inertia-location", location);
-    }
-    response
 }

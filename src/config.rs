@@ -10,9 +10,6 @@ use crate::featured::{self, FeaturedSource};
 pub struct Config {
     /// `APP_NAME`: the shared `name` prop and the health page title.
     pub app_name: String,
-    /// `APP_URL` without a trailing slash: where a tab left open on the old
-    /// site is sent back to.
-    pub app_url: String,
     pub github: GitHubConfig,
     pub esi: EsiConfig,
     /// The hand-picked projects on the landing page (`featured::PROJECTS`).
@@ -49,13 +46,12 @@ pub struct UpstreamConfig {
 }
 
 pub const DEFAULT_APP_NAME: &str = "Nicolas Kion";
-pub const DEFAULT_APP_URL: &str = "https://nicolaskion.dev";
 pub const DEFAULT_GITHUB_API_URL: &str = "https://api.github.com";
 pub const DEFAULT_ESI_URL: &str = "https://esi.evetech.net";
 
 impl Default for UpstreamConfig {
     /// Two retries after 250 ms and 1 s, a 10 s timeout and 5 s to
-    /// connect. The same as the Laravel HTTP client was configured with.
+    /// connect.
     fn default() -> Self {
         Self {
             retry_delays: vec![Duration::from_millis(250), Duration::from_secs(1)],
@@ -65,7 +61,7 @@ impl Default for UpstreamConfig {
     }
 }
 
-/// A variable that is set and not blank (Laravel's `filled()`), trimmed.
+/// A variable that is set and not blank trimmed.
 pub fn filled(value: Option<String>) -> Option<String> {
     value
         .map(|value| value.trim().to_owned())
@@ -88,7 +84,6 @@ impl Config {
     pub fn from_env() -> Self {
         Self {
             app_name: env_or("APP_NAME", DEFAULT_APP_NAME),
-            app_url: without_trailing_slash(env_or("APP_URL", DEFAULT_APP_URL)),
             github: GitHubConfig {
                 token: env("GITHUB_TOKEN"),
                 api_url: without_trailing_slash(env_or("GITHUB_API_URL", DEFAULT_GITHUB_API_URL)),

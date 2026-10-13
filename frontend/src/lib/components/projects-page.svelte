@@ -1,5 +1,5 @@
 <script lang="ts">
-  // The landing page, ported from Projects.vue: the header with the pilot
+  // The landing page: the header with the pilot
   // dossier, the featured work, the searchable repositories and the
   // footer. The root clips horizontal overflow so the dot grid behind the
   // header cannot widen the page on phones.

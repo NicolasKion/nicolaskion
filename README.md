@@ -119,7 +119,7 @@ The Rust suites drive the real router against a mock GitHub and ESI on
 an ephemeral port. Playwright runs against the composed stack on port
 5314.
 
-## Deploying
+## Deployment
 
 Coolify deploys `compose.prod.yml` on the server. A merge to main runs
 `.github/workflows/release.yml`, which builds the api, frontend and proxy

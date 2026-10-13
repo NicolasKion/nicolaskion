@@ -65,7 +65,7 @@ jobs:
               - "src/**"
               - "frontend/**"
               - "tests/fixtures/**"
-              - scripts/laravel-reference/upstream.py
+              - scripts/upstream-mock.py
               - Cargo.toml
               - Cargo.lock
               - Dockerfile

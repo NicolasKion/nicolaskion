@@ -24,7 +24,7 @@ browser at Axum's port directly. The setup mirrors MutaMarket
 - Frontend logic has vitest suites next to the code (`*.test.ts`, and
   `*.svelte.test.ts` in a browser). Playwright (`frontend/e2e`) runs
   against the composed stack with `compose.e2e.yml`, which points the
-  API at the Python mock in `scripts/laravel-reference/upstream.py`.
+  API at the Python mock in `scripts/upstream-mock.py`.
 - Before committing: `cargo fmt`, `cargo clippy --all-targets` (zero
   warnings), `cargo test`, and in `frontend/` `npm run check`,
   `npm run lint`, `npm run format:check`, `npm test`.
@@ -49,15 +49,3 @@ browser at Axum's port directly. The setup mirrors MutaMarket
 - Deploy: merge to main; GitHub Actions builds the api, frontend and
   proxy images, pushes them to GHCR and Coolify redeploys
   (`compose.prod.yml`).
-
-## Migration from Laravel (removed before the merge to main)
-
-- `FIXES.md` lists every difference from the Laravel app,
-  `tests/PORTED.md` maps the PHP tests.
-- `scripts/laravel-reference/` runs the Laravel app from `main` on
-  127.0.0.1:8314 with the mock upstream and records the golden fixtures
-  (`tests/fixtures/golden`) and the screenshots
-  (`frontend/e2e/__screenshots__`). The golden comparisons live in
-  `tests/integration/golden_*.rs`, `seo.golden.test.ts`, `seo.spec.ts` and
-  `visual.spec.ts`.
-- `scripts/parity` prints passing over total per suite.

@@ -56,7 +56,6 @@ test('opens every outside link in a new tab', async ({ page }) => {
   }
 });
 
-// FIXES.md "The page is rendered on the server".
 test('renders the whole page without javascript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
@@ -68,7 +67,6 @@ test('renders the whole page without javascript', async ({ browser }) => {
   await context.close();
 });
 
-// FIXES.md "The page scrolled sideways on phones".
 test('does not scroll sideways on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

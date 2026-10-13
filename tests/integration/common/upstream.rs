@@ -1,6 +1,6 @@
 //! A mock of the GitHub and ESI endpoints on an ephemeral port, serving
-//! tests/fixtures/upstream like scripts/laravel-reference/upstream.py does
-//! for the Laravel reference. Records every request and fails on demand.
+//! tests/fixtures/upstream like scripts/upstream-mock.py does for the
+//! composed stack. Records every request and fails on demand.
 
 use std::collections::BTreeMap;
 use std::net::SocketAddr;
@@ -180,8 +180,7 @@ impl MockUpstream {
             .collect()
     }
 
-    /// The scenarios of scripts/laravel-reference/upstream.py, which the
-    /// golden fixtures were recorded against.
+    /// The scenarios scripts/upstream-mock.py offers too.
     pub fn scenario(&self, name: &str) {
         match name {
             "normal" => {}

@@ -1,6 +1,5 @@
 //! The landing page props: the GitHub profile, the EVE pilot, the featured
-//! projects, the public repositories and the stack, as the Laravel
-//! `ProjectsController` built them.
+//! projects, the public repositories and the stack.
 
 use serde::Serialize;
 
@@ -53,7 +52,7 @@ pub fn stack_languages(all: &[Repository]) -> Vec<String> {
             None => counts.push((language, 1)),
         }
     }
-    // A stable sort, like PHP's arsort: ties keep their order.
+    // A stable sort: ties keep their order.
     counts.sort_by_key(|&(_, count)| std::cmp::Reverse(count));
     counts
         .into_iter()

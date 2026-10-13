@@ -1,4 +1,4 @@
-//! Health checks: Laravel's `/up` page and the deploy check `/api/health`.
+//! Health checks: the `/up` page and the deploy check `/api/health`.
 
 use std::time::Instant;
 
@@ -9,10 +9,10 @@ use serde_json::{Value, json};
 
 use super::AppState;
 
-/// Laravel's health page (`withRouting(health: '/up')`).
+/// The health page.
 const UP_PAGE: &str = include_str!("up.html");
 
-/// PHP's `htmlspecialchars`, as Blade's `{{ }}` escaped.
+/// Escapes text for HTML, quotes included.
 pub fn escape_html(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")

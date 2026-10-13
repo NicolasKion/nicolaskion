@@ -7,6 +7,5 @@
 export const updateFeedPrefix = '/storage/tt-8d20886697466b8297bb6d6e1735fa53/';
 
 // Paths Axum owns outright: every method proxies to the api. `/storage` is
-// the rest of Laravel's dead local disk routes (403), `/up` the health
-// page.
+// refused outside the update feed (403), `/up` is the health page.
 export const axumPrefixes = ['/api', '/storage', '/up'];

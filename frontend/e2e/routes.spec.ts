@@ -10,7 +10,6 @@ test('answers unknown pages with the not found page', async ({ page }) => {
   }
 });
 
-// FIXES.md "Trailing slashes": Laravel answered /up/ like /up.
 test('redirects the health page with a trailing slash to the slashless URL', async ({
   request,
 }) => {
@@ -33,7 +32,6 @@ test('sends the security headers', async ({ request }) => {
   }
 });
 
-// FIXES.md "No cookies".
 test('sets no cookies', async ({ request }) => {
   const response = await request.get('/');
   expect(response.headers()['set-cookie']).toBeUndefined();
@@ -65,16 +63,7 @@ test('answers the health checks', async ({ request }) => {
   expect(await health.json()).toEqual({ status: 'ok' });
 });
 
-test('refuses the old storage routes outside the update feed', async ({ request }) => {
+test('refuses the storage routes outside the update feed', async ({ request }) => {
   expect((await request.get('/storage/anything.txt')).status()).toBe(403);
   expect((await request.put('/storage/anything.txt', { data: 'x' })).status()).toBe(403);
-});
-
-// FIXES.md "Tabs left open on the Laravel site".
-test('sends tabs left open on the Laravel site to a full reload', async ({ request, baseURL }) => {
-  const response = await request.get('/?from=tab', {
-    headers: { 'X-Inertia': 'true', 'X-Inertia-Version': 'old' },
-  });
-  expect(response.status()).toBe(409);
-  expect(response.headers()['x-inertia-location']).toBe(`${baseURL}/?from=tab`);
 });

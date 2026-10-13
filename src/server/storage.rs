@@ -1,13 +1,13 @@
-//! `/storage/{path}`: Laravel's local disk routes, which only answer signed
-//! URLs, and nothing ever signed one. The update feed under
-//! `/storage/tt-.../` never reaches the api: Caddy serves it from disk.
+//! `/storage/{path}`: the api serves no files and refuses every request.
+//! The update feed under `/storage/tt-.../` never reaches it: Caddy
+//! serves that from disk.
 
 use axum::http::{StatusCode, header};
 use axum::response::Response;
 
 use super::errors::error_page;
 
-/// GET, HEAD and PUT: the 403 Laravel gave every unsigned request.
+/// GET, HEAD and PUT: forbidden.
 pub async fn local_disk() -> Response {
     error_page(StatusCode::FORBIDDEN)
 }

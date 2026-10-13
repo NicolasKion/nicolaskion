@@ -1,7 +1,6 @@
-//! Port of tests/Feature/SyncLogosTest.php: `sync_logos` downloads every
-//! logo and dark variant from its source into the static directory, and
-//! keeps the existing file when a download fails or is not the expected
-//! image type.
+//! `sync_logos` downloads every logo and dark variant from its source
+//! into the static directory, and keeps the existing file when a download
+//! fails or is not the expected image type.
 
 use nicolaskion::config::UpstreamConfig;
 use nicolaskion::featured::FeaturedSource;
@@ -87,7 +86,7 @@ async fn downloads_every_logo_and_dark_variant_from_its_source() {
     );
 }
 
-/// The dataset of the PHP test: a missing source and a wrong image type.
+/// A missing source and a wrong image type.
 #[tokio::test]
 async fn keeps_the_existing_logo_when_the_source_is_missing_or_not_the_expected_image_type() {
     for (case, status, body, message) in [

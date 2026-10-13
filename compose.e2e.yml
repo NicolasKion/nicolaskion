@@ -1,6 +1,5 @@
 # The end-to-end setup: the api reads GitHub and ESI from a mock serving
-# tests/fixtures/upstream (scripts/laravel-reference/upstream.py, the same
-# mock the Laravel reference was recorded against), and Caddy serves the
+# tests/fixtures/upstream (scripts/upstream-mock.py), and Caddy serves the
 # fixture update feed.
 #   docker compose -f docker-compose.yml -f compose.e2e.yml up --build -d
 
@@ -12,7 +11,7 @@ services:
     environment:
       UPSTREAM_FIXTURES: /fixtures
     volumes:
-      - ./scripts/laravel-reference/upstream.py:/mock/upstream.py:ro
+      - ./scripts/upstream-mock.py:/mock/upstream.py:ro
       - ./tests/fixtures/upstream:/fixtures:ro
 
   api:

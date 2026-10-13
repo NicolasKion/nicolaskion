@@ -1,6 +1,5 @@
-//! A stale-while-revalidate cache for one upstream value, the in-memory
-//! counterpart of Laravel's `Cache::flexible`. Unlike Laravel, a failed
-//! fetch never throws the last good value away.
+//! A stale-while-revalidate cache for one upstream value, in memory. A
+//! failed fetch never throws the last good value away.
 
 use std::future::Future;
 use std::sync::atomic::{AtomicU64, Ordering};

@@ -5,7 +5,6 @@
 // Not every suite uses every helper.
 #![allow(dead_code)]
 
-pub mod golden;
 pub mod upstream;
 
 use std::path::{Path, PathBuf};
@@ -25,10 +24,9 @@ use nicolaskion::server::AppState;
 
 pub use upstream::{MockUpstream, Service};
 
-/// The token and character the tests and the golden fixtures use.
+/// The token and character the tests use.
 pub const TOKEN: &str = "fake-token";
 pub const CHARACTER_ID: &str = "95569887";
-pub const APP_URL: &str = "https://nicolaskion.dev";
 
 pub fn repo_path(relative: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join(relative)
@@ -39,7 +37,6 @@ pub fn repo_path(relative: &str) -> PathBuf {
 pub fn test_config(upstream: &MockUpstream) -> Config {
     Config {
         app_name: "Nicolas Kion".to_owned(),
-        app_url: APP_URL.to_owned(),
         github: GitHubConfig {
             token: Some(TOKEN.to_owned()),
             api_url: upstream.github_url(),
@@ -57,7 +54,7 @@ pub fn test_config(upstream: &MockUpstream) -> Config {
     }
 }
 
-/// The two featured projects of ProjectsPageTest's `beforeEach`.
+/// Two featured projects: one without a repository, one with.
 pub fn test_featured() -> Vec<FeaturedSource> {
     vec![
         FeaturedSource {

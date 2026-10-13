@@ -52,7 +52,7 @@ pub struct EveCharacter {
     pub corporation_ticker: String,
     pub alliance_name: Option<String>,
     pub alliance_ticker: Option<String>,
-    #[serde(serialize_with = "php_float")]
+    #[serde(serialize_with = "whole_as_integer")]
     pub security_status: f64,
     pub pilot_since: i32,
     pub portrait_url: String,
@@ -60,9 +60,8 @@ pub struct EveCharacter {
     pub eve_who_url: String,
 }
 
-/// PHP's `json_encode` writes a float without a fraction as an integer
-/// (`0`, `-5`); the props keep that shape.
-fn php_float<S: Serializer>(value: &f64, serializer: S) -> Result<S::Ok, S::Error> {
+/// A float without a fraction is written as an integer (`0`, `-5`).
+fn whole_as_integer<S: Serializer>(value: &f64, serializer: S) -> Result<S::Ok, S::Error> {
     // Whole values within the exactly representable integers.
     const LIMIT: f64 = 9_007_199_254_740_992.0;
     if value.fract() == 0.0 && value.abs() < LIMIT {
@@ -72,9 +71,9 @@ fn php_float<S: Serializer>(value: &f64, serializer: S) -> Result<S::Ok, S::Erro
     }
 }
 
-/// PHP's `round($value, 1)`: half away from zero, on the decimal value
-/// PHP prints (15 significant digits), so 0.35 rounds to 0.4 although the
-/// double is a hair below it.
+/// Rounds to one decimal, half away from zero, on the decimal value with
+/// 15 significant digits, so 0.35 rounds to 0.4 although the double is a
+/// hair below it.
 pub fn round_one_decimal(value: f64) -> f64 {
     if !value.is_finite() || value == 0.0 {
         return value;
@@ -104,14 +103,14 @@ pub fn round_one_decimal(value: f64) -> f64 {
 }
 
 /// The year of an ESI birthday (`2015-05-05T14:16:51Z`) in its own
-/// offset, as Carbon read it (ESI always answers in UTC).
+/// offset (ESI always answers in UTC).
 pub fn birth_year(birthday: &str) -> Option<i32> {
     OffsetDateTime::parse(birthday, &Rfc3339)
         .ok()
         .map(OffsetDateTime::year)
 }
 
-/// PHP's `(int)` cast of the configured id: the leading integer, else 0.
+/// The configured id: its leading integer, else 0.
 pub fn character_id(configured: &str) -> i64 {
     let text = configured.trim();
     let (sign, digits) = match text.strip_prefix('-') {
@@ -258,7 +257,7 @@ mod tests {
     }
 
     #[test]
-    fn the_character_id_is_read_like_a_php_int_cast() {
+    fn the_character_id_is_its_leading_integer() {
         assert_eq!(character_id("95569887"), 95569887);
         assert_eq!(character_id(" 95569887 "), 95569887);
         assert_eq!(character_id("95569887abc"), 95569887);
@@ -266,15 +265,54 @@ mod tests {
         assert_eq!(character_id("-5"), -5);
     }
 
+    /// Half away from zero on the value with 15 significant digits, and
+    /// the sign of a negative zero survives.
     #[test]
     fn rounding_is_half_away_from_zero() {
-        assert_eq!(round_one_decimal(-0.45), -0.5);
-        assert_eq!(round_one_decimal(0.35), 0.4);
-        assert_eq!(round_one_decimal(2.25), 2.3);
-        assert_eq!(round_one_decimal(-2.25), -2.3);
-        assert_eq!(round_one_decimal(4.9999999), 5.0);
-        assert_eq!(round_one_decimal(0.04), 0.0);
-        assert!(round_one_decimal(-0.04).is_sign_negative());
+        let cases = [
+            (-0.45, -0.5),
+            (0.45, 0.5),
+            (-0.05, -0.1),
+            (0.05, 0.1),
+            (0.15, 0.2),
+            (0.25, 0.3),
+            (0.35, 0.4),
+            (-0.35, -0.4),
+            (1.05, 1.1),
+            (1.45, 1.5),
+            (-1.45, -1.5),
+            (2.25, 2.3),
+            (-2.25, -2.3),
+            (2.55, 2.6),
+            (-2.55, -2.6),
+            (2.5500000000000003, 2.6),
+            (4.95, 5.0),
+            (-4.95, -5.0),
+            (4.9999999, 5.0),
+            (-9.999999, -10.0),
+            (5.0, 5.0),
+            (-10.0, -10.0),
+            (0.0, 0.0),
+            (-0.0, -0.0),
+            (0.04, 0.0),
+            (-0.04, -0.0),
+            (0.04999999, 0.0),
+            (-0.04999999, -0.0),
+            (3.1234567, 3.1),
+            (-1.2345678901234, -1.2),
+            (0.30000000000000004, 0.3),
+            (1e-06, 0.0),
+            (-7.123456789, -7.1),
+        ];
+        for (input, expected) in cases {
+            let actual = round_one_decimal(input);
+            assert_eq!(actual, expected, "round {input}");
+            assert_eq!(
+                actual.is_sign_negative(),
+                expected.is_sign_negative(),
+                "sign of round {input}"
+            );
+        }
     }
 
     #[test]

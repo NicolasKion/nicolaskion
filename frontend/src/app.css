@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
-/* Instrument Sans, self-hosted, declared like the Laravel page's Bunny
-   font plugin did: one rule per weight and format, woff2 first. The later
+/* Instrument Sans, self-hosted: one rule per weight and format, woff2
+   first. The later
    (woff) rule wins in browsers, and its metrics differ a little from the
    woff2 file, so this keeps the text wrapping where it did. */
 @font-face {

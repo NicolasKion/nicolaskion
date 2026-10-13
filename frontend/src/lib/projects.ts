@@ -1,4 +1,4 @@
-// The landing page's logic, ported from Projects.vue: language colors,
+// The landing page's logic: language colors,
 // the owner filter, the repository search and the relative push dates.
 import type { Owner, Profile, Repository } from './types.ts';
 

@@ -1,7 +1,5 @@
-//! The props of the one page, as the Laravel Inertia page received them
-//! with the shared props merged in (`HandleInertiaRequests`: the app name
-//! and a user that is always null). SvelteKit's `+page.server.ts` loads
-//! them.
+//! The props of the one page, with the app name and a user that is
+//! always null. SvelteKit's `+page.server.ts` loads them.
 
 use axum::Json;
 use axum::extract::State;

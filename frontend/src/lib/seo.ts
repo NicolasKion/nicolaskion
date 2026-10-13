@@ -1,6 +1,5 @@
 // The <head> of the landing page (components/page-head.svelte), as data so
-// it can be tested without rendering: the tags of Laravel's Blade root
-// view, with the title the Inertia page set in the browser.
+// it can be tested without rendering.
 
 export const DESCRIPTION =
   "Hi, I'm Nicolas. I play EVE Online and build tools for it: MutaMarket, wormhole.systems, Telescope, Killfeed, EVE Wrench, and more.";
@@ -17,8 +16,8 @@ export type Head = {
 };
 
 /** The head for the site at `origin` (no trailing slash), named
- * `appName`. The canonical URL is the origin itself, as Laravel's
- * `url('/')` wrote it. */
+ * `appName`. The canonical URL is the origin itself, without a
+ * trailing slash. */
 export function pageHead({ appName, origin }: { appName: string; origin: string }): Head {
   const social = `${appName} | ${TITLE}`;
   const image = `${origin}/og-image.png`;

@@ -67,8 +67,7 @@ async fn the_mock_upstream_fails_on_demand() {
     assert_eq!(get(&format!("{}/alliances/1", mock.esi_url())).await.0, 200);
 }
 
-/// Every route from the Laravel inventory that the api owns exists: it
-/// may not work yet, but it is never an unknown path.
+/// Every route the api owns exists: none of them is an unknown path.
 #[tokio::test]
 async fn every_api_route_exists() {
     let app = TestApp::new().await;

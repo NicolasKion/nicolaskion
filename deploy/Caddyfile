@@ -38,7 +38,7 @@
 
 	handle {
 		encode zstd gzip
-		# Laravel answered /up/ like /up.
+		# /up/ is the health page too.
 		redir /up/ /up 308
 
 		@axum path /api/* /storage/* /up

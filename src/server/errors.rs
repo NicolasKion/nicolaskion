@@ -1,4 +1,4 @@
-//! Error answers: JSON under `/api`, Laravel's minimal error page
+//! Error answers: JSON under `/api`, a minimal error page
 //! everywhere else.
 
 use axum::Json;
