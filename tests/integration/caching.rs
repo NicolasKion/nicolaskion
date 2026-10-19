@@ -104,7 +104,7 @@ async fn a_failed_refresh_keeps_the_stale_data() {
     assert_eq!(page["profile"]["login"], "NicolasKion");
     assert_eq!(
         page["repositories"].as_array().expect("repositories").len(),
-        12
+        14
     );
 }
 
@@ -122,7 +122,7 @@ async fn expired_data_is_served_when_the_refresh_fails() {
     assert_eq!(page["profile"]["login"], "NicolasKion");
     assert_eq!(
         page["repositories"].as_array().expect("repositories").len(),
-        12
+        14
     );
     assert_eq!(page["character"]["name"], "Nicolas Kion");
 
@@ -165,7 +165,7 @@ async fn a_malformed_answer_is_not_cached() {
             .as_array()
             .expect("repositories")
             .len(),
-        12
+        14
     );
 }
 
