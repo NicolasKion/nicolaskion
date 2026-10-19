@@ -10,7 +10,7 @@ axum = "0.8"
 dotenvy = "0.15"
 # Tells PNG and other binary images apart when the logos are synced
 # (src/logos.rs); SVG is text and checked by hand.
-infer = "0.19"
+infer = "0.22"
 reqwest = { version = "0.13", default-features = false, features = [
     "rustls",
     "query",
