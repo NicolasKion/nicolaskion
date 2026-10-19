@@ -19,11 +19,11 @@ test('renders the dossier, featured work and repositories from the mock data', a
   await expect(dossier.getByText('Strix Ridens. [STRIX]')).toBeVisible();
   await expect(dossier.getByText('-0.5')).toBeVisible();
   await expect(dossier.getByText('Rust · PHP · TypeScript')).toBeVisible();
-  await expect(dossier.getByText('12 repos · 63 stars')).toBeVisible();
+  await expect(dossier.getByText('14 repos · 63 stars')).toBeVisible();
   await expect(dossier.getByText(/MutaMarket\s*· 5 years ago/)).toBeVisible();
 
   await expect(page.getByRole('article')).toHaveCount(8);
-  await expect(page.getByText('12 repos / 63 stars')).toBeVisible();
+  await expect(page.getByText('14 repos / 63 stars')).toBeVisible();
   await expect(page.getByText('GitHub token missing')).toHaveCount(0);
   noErrors();
 });
@@ -31,7 +31,7 @@ test('renders the dossier, featured work and repositories from the mock data', a
 test('searches the repositories and filters them by owner', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('a[href^="https://github.com/"]').filter({ has: page.locator('p') });
-  await expect(cards).toHaveCount(12);
+  await expect(cards).toHaveCount(14);
 
   await page.getByPlaceholder('Search repositories…').fill('laravel');
   await expect(cards).toHaveCount(1);
@@ -41,7 +41,7 @@ test('searches the repositories and filters them by owner', async ({ page }) => 
   await page.getByRole('button', { name: /WormholeSystems/ }).click();
   await expect(cards).toHaveCount(2);
   await page.getByRole('button', { name: /WormholeSystems/ }).click();
-  await expect(cards).toHaveCount(12);
+  await expect(cards).toHaveCount(14);
 
   await page.getByPlaceholder('Search repositories…').fill('no such thing');
   await expect(page.getByText('No repositories match your search.')).toBeVisible();

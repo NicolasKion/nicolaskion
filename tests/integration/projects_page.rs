@@ -446,7 +446,7 @@ async fn a_failing_profile_keeps_the_repositories() {
     assert_eq!(page["profile"], Value::Null);
     assert_eq!(
         page["repositories"].as_array().expect("repositories").len(),
-        12
+        14
     );
 }
 

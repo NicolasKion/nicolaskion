@@ -178,7 +178,7 @@
     "node_id": "R_107",
     "name": "eve-wrench-app",
     "full_name": "eve-wrench/eve-wrench-app",
-    "private": true,
+    "private": false,
     "owner": {
       "login": "eve-wrench",
       "id": 1010,
@@ -352,7 +352,7 @@
     "node_id": "R_113",
     "name": "telescope-app",
     "full_name": "eve-telescope/telescope-app",
-    "private": true,
+    "private": false,
     "owner": {
       "login": "eve-telescope",
       "id": 1013,
